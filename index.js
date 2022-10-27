@@ -48,13 +48,13 @@ const postOption = {
 }
 
 app.post('/sendUpdate', async (req, res) => {
-    const { accessToken } = req.body;
+    const { accessToken, point } = req.body;
     const {reference, game_id, configuration, iat, exp} = jwt.decode(accessToken);
     
     const jsonData = {
         "reference": reference,
         "game_id" : game_id,
-        "point" : 10
+        "point" : point
     }
 
     try {
