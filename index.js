@@ -2,12 +2,15 @@ const express = require('express');
 const app = express();
 const PORT = 3001
 
+const path = require('path');
+
 const axios = require('axios');
 
 const jwt = require('jsonwebtoken');
 const jwtExtractor = require('passport-jwt').ExtractJwt;
 const jwtStrategy = require('passport-jwt').Strategy;
 const passport = require('passport');
+const exp = require('constants');
 
 const dotEnv = require('dotenv').config();
 const SECRET_KEY = process.env.TOKEN_SECRET;
@@ -34,7 +37,7 @@ const middlewareGame = passport.authenticate("jwt", {session: false});
 app.use(express.json());
 
 app.get('/', middlewareGame, (req, res) => {
-    res.send('this is game page');
+    res.sendFile(path.join(__dirname+'/dist/index.html'))
 });
 
 const postOption = {
