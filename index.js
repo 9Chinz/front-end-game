@@ -36,9 +36,13 @@ const middlewareGame = passport.authenticate("jwt", {session: false});
 
 app.use(express.json());
 
+
+
 app.get('/', middlewareGame, (req, res) => {
-    res.sendFile(path.join(__dirname+'/index.html'))
+    res.sendFile(path.join(__dirname+'/dist/index.html'))
 });
+
+app.use("/", express.static(__dirname+'/dist'))
 
 const postOption = {
     headers: {
