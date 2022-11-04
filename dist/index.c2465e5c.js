@@ -556,6 +556,8 @@ const loadingMenu = document.querySelector(".loading-menu");
 const selectCharMenu = document.querySelector(".select-char-menu");
 const startMenu = document.querySelector(".start-menu");
 const goMainGame = document.getElementById("go_main_game");
+const playAgainBtn = document.getElementById("playAgain");
+const scoreDisplayBoard = document.getElementById("score_diplay");
 const scoreBoard = document.getElementById("score-game");
 const bgGame = new URL(require("d8e3f35c383595e3"));
 let scene, renderer, camera;
@@ -784,7 +786,7 @@ function initGameControl() {
     // controls = new OrbitControls(camera, pageName['mainGamePage'])
     // controls.update()
     var el = pageName["mainGamePage"];
-    const BALLSPEED = -30;
+    const BALLSPEED = -60;
     (0, _swipeControlsJsDefault.default)(el, function(swipedir) {
         console.log(swipedir);
         if (!isShoot) {
@@ -793,11 +795,11 @@ function initGameControl() {
                 isShoot = true;
                 shootTime = new Date().getTime();
             } else if (swipedir == "upLeft") {
-                sphrBody.velocity.set(-9, 12, BALLSPEED);
+                sphrBody.velocity.set(-18, 12, BALLSPEED);
                 isShoot = true;
                 shootTime = new Date().getTime();
             } else if (swipedir == "upRight") {
-                sphrBody.velocity.set(9, 12, BALLSPEED);
+                sphrBody.velocity.set(18, 12, BALLSPEED);
                 isShoot = true;
                 shootTime = new Date().getTime();
             }
@@ -813,9 +815,15 @@ function initDebugTool() {
 }
 function renderGame() {
     // event key
-    if (gameRound >= 5) console.log("game end");
+    if (gameRound >= 5) {
+        scoreDisplayBoard.innerHTML = shootSuccess;
+        isShoot = true;
+        gameRound = 0;
+        shootSuccess = 0;
+        document.querySelector(".final-score-ui").setAttribute("style", "display: block;");
+    }
     if (isShoot) {
-        if (new Date().getTime() - shootTime >= 4000) {
+        if (new Date().getTime() - shootTime >= 3000) {
             isShoot = false;
             gameRound += 1;
             sphrBody.position.set(0, 2, 15);
@@ -862,6 +870,11 @@ goMainGame.addEventListener("click", ()=>{
     selectCharMenu.setAttribute("style", "display:none");
     document.querySelector(".game-interface").setAttribute("style", "display: block");
     startGame();
+});
+playAgain.addEventListener("click", ()=>{
+    scoreBoard.innerHTML = 0;
+    isShoot = false;
+    document.querySelector(".final-score-ui").setAttribute("style", "display: none;");
 });
 
 },{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","5c4ca6b4639d1d51":"fXgSV","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","d8e3f35c383595e3":"9j26s"}],"ktPTu":[function(require,module,exports) {
