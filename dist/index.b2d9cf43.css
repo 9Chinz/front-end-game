@@ -13,8 +13,6 @@ body {
 }
 
 body #gameCanvas {
-  object-fit: cover;
-  object-position: 50 50;
   background-image: url("Select-Char.af26d599.png");
   background-position: center;
   background-repeat: no-repeat;
@@ -67,7 +65,7 @@ body #gameCanvas .start-menu .play-btn button {
   color: #fff;
   background-color: #d12020;
   border-radius: 35px;
-  padding: 1vh 2rem;
+  padding: 1vh 3rem;
   font-family: Prompt-Bold;
   font-size: 1.2em;
 }
@@ -83,7 +81,7 @@ body #gameCanvas .start-menu .reward-btn button {
   color: #fff;
   background-color: #d12020;
   border-radius: 35px;
-  padding: 1vh 2.5rem;
+  padding: 1vh 1rem;
   font-family: Prompt-Bold;
   font-size: 1.2em;
 }
@@ -133,8 +131,17 @@ body #gameCanvas .loading-menu .fifa-logo {
   position: relative;
 }
 
-body #gameCanvas .loading-menu .fifa-logo img, body #gameCanvas .select-char-menu {
+body #gameCanvas .loading-menu .fifa-logo img {
   width: 100%;
+}
+
+body #gameCanvas .select-char-menu {
+  width: 100%;
+  object-fit: cover;
+  background-image: url("Select-Char.af26d599.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
 }
 
 body #gameCanvas .select-char-menu .player-head {
@@ -223,6 +230,29 @@ body #gameCanvas .select-char-menu .main-game-btn button {
   background-color: red;
   border-radius: 25px;
   padding: 1vh 2rem;
+  font-family: Prompt-Bold;
+  font-size: 1.2rem;
+}
+
+body #gameCanvas .game-interface {
+  color: red;
+  position: absolute;
+  top: 90%;
+}
+
+body #gameCanvas .game-interface .ui-container {
+  width: 100%;
+}
+
+body #gameCanvas .game-interface .ui-container .football {
+  width: 10%;
+}
+
+body #gameCanvas .game-interface .ui-container .football img {
+  width: 100%;
+}
+
+body #gameCanvas .game-interface .ui-container .football-score {
   font-family: Prompt-Bold;
   font-size: 1.2rem;
 }
