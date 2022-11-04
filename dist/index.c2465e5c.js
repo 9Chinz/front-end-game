@@ -573,8 +573,8 @@ function start() {
     camera = new _three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 6, 5);
     // Stats.js
-    stats = new (0, _statsModuleDefault.default)();
-    document.querySelector("#gameCanvas").appendChild(stats.dom);
+    // stats = new Stats()
+    // document.querySelector('#gameCanvas').appendChild(stats.dom)
     const ambLight = new _three.AmbientLight(0xffffff, 0.1);
     scene.add(ambLight);
     const light = new _three.DirectionalLight(0xdfdfdf, 1);
@@ -602,7 +602,7 @@ function windowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 function initObject() {
-    loadModel(new URL(require("58848d0079a09d57")), "argen");
+    loadModel(new URL(require("58848d0079a09d57")), "argen", true);
     loadModel(new URL(require("7c1ef81311401fad")), "belgium");
     loadModel(new URL(require("55b72701edf72064")), "brazil");
     loadModel(new URL(require("ccd19c951c0d4e42")), "england");
@@ -611,13 +611,14 @@ function initObject() {
     loadModel(new URL(require("5b58ffaaa81606fd")), "qatar");
     loadModel(new URL(require("394cdb9504b215c7")), "spain");
 }
-function loadModel(url, key) {
+function loadModel(url, key, showNow = false) {
     assetLoader = new (0, _gltfloaderJs.GLTFLoader)(loadingManage);
     assetLoader.load(url.href, (gltf)=>{
         const model = gltf.scene;
         playerList[key] = model;
         scene.add(model);
         model.visible = false;
+        if (showNow) currentShow = key;
     });
 }
 function initInput() {
@@ -664,7 +665,7 @@ function animate() {
     // if have three with cannon
     // position of obj in three copy position obj of cannon
     renderer.render(scene, camera);
-    stats.update();
+// stats.update()
 }
 // control menu
 goSelectChar.addEventListener("click", ()=>{
