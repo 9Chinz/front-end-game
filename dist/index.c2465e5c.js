@@ -571,10 +571,10 @@ function start() {
     document.querySelector("#gameCanvas").appendChild(renderer.domElement);
     scene = new _three.Scene();
     camera = new _three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 6, 5);
+    camera.position.set(0, 3, 5);
     // Stats.js
-    // stats = new Stats()
-    // document.querySelector('#gameCanvas').appendChild(stats.dom)
+    stats = new (0, _statsModuleDefault.default)();
+    document.querySelector("#gameCanvas").appendChild(stats.dom);
     const ambLight = new _three.AmbientLight(0xffffff, 0.1);
     scene.add(ambLight);
     const light = new _three.DirectionalLight(0xdfdfdf, 1);
@@ -616,6 +616,7 @@ function loadModel(url, key, showNow = false) {
     assetLoader.load(url.href, (gltf)=>{
         const model = gltf.scene;
         playerList[key] = model;
+        model.position.set(0, -0.4, 0);
         scene.add(model);
         model.visible = false;
         if (showNow) currentShow = key;
@@ -665,15 +666,13 @@ function animate() {
     // if have three with cannon
     // position of obj in three copy position obj of cannon
     renderer.render(scene, camera);
-// stats.update()
+    stats.update();
 }
 // control menu
 goSelectChar.addEventListener("click", ()=>{
-    setTimeout(()=>{
-        startMenu.setAttribute("style", "display:none;");
-        start();
-    }, 3000);
     loadingMenu.setAttribute("style", "display:flex;");
+    startMenu.setAttribute("style", "display:none;");
+    start();
 });
 
 },{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD"}],"ktPTu":[function(require,module,exports) {
