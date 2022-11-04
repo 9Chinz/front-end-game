@@ -573,8 +573,8 @@ function start() {
     camera = new _three.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
     camera.position.set(0, 3, 5);
     // Stats.js
-    stats = new (0, _statsModuleDefault.default)();
-    document.querySelector("#gameCanvas").appendChild(stats.dom);
+    // stats = new Stats()
+    // document.querySelector('#gameCanvas').appendChild(stats.dom)
     const ambLight = new _three.AmbientLight(0xffffff, 0.1);
     scene.add(ambLight);
     const light = new _three.DirectionalLight(0xdfdfdf, 1);
@@ -666,7 +666,7 @@ function animate() {
     // if have three with cannon
     // position of obj in three copy position obj of cannon
     renderer.render(scene, camera);
-    stats.update();
+// stats.update()
 }
 // control menu
 goSelectChar.addEventListener("click", ()=>{
