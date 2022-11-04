@@ -564,6 +564,7 @@ function start() {
     renderer = new _three.WebGLRenderer({
         alpha: true
     });
+    renderer.alpha = false;
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
@@ -577,14 +578,14 @@ function start() {
     // document.querySelector('#gameCanvas').appendChild(stats.dom)
     const ambLight = new _three.AmbientLight(0xffffff, 0.1);
     scene.add(ambLight);
-    const light = new _three.DirectionalLight(0xdfdfdf, 1);
+    const light = new _three.DirectionalLight(0xffffff, 1.1);
     light.position.set(0, 0, 20);
     light.castShadow = true;
     light.shadow.camera.near = 10;
     light.shadow.camera.far = 100;
     light.shadow.camera.fov = 30;
     scene.add(light);
-    const light2 = new _three.DirectionalLight(0xdfdfdf, 1);
+    const light2 = new _three.DirectionalLight(0xffffff, 1.1);
     light2.position.set(0, 0, -20);
     light2.castShadow = true;
     light2.shadow.camera.near = 10;
