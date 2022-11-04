@@ -42529,7 +42529,7 @@ function CannonDebugger(scene, world, _temp) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function swipedetect(el, callback) {
-    var touchsurface = el, swipedir, startX, startY, distX, distY, threshold = 25, restraint = 100, allowedTime = 300, elapsedTime, startTime, swipeSpeed, swipeAngle, handleswipe = callback || function(swipedir) {};
+    var touchsurface = el, swipedir, startX, startY, distX, distY, threshold = 25, restraint = 100, allowedTime = 300, elapsedTime, startTime, handleswipe = callback || function(swipedir) {};
     touchsurface.addEventListener("touchstart", function(e) {
         var touchobj = e.changedTouches[0];
         swipedir = "none";
@@ -42553,10 +42553,7 @@ function swipedetect(el, callback) {
         elapsedTime = new Date().getTime() - startTime // get time elapsed
         ;
         console.log(`x${distX} ${distY}`);
-        if (elapsedTime <= allowedTime) // if (Math.abs(distX) >= threshold && Math.abs(distY) <= restraint) { // 2nd condition for horizontal swipe met
-        //     swipedir = (distX < 0) ? 'left' : 'right' // if dist traveled is negative, it indicates left swipe
-        // }
-        {
+        if (elapsedTime <= allowedTime) {
             if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) {
                 swipedir = distY < 0 ? "up" : "down" // if dist traveled is negative, it indicates up swipe
                 ;
