@@ -818,8 +818,8 @@ function initDebugTool() {
 async function renderGame() {
     // event key
     if (gameRound >= 5) {
-        console.log("one times");
         const jsonResData = await sendUpdate();
+        console.log(jsonResData);
         if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = true;
