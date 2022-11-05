@@ -578,6 +578,7 @@ let shootTime;
 let gameRound = 0;
 let shootSuccess = 0;
 let newRef = "";
+let tokenLeft = document.getElementById("token_display");
 const loadingManage = new _three.LoadingManager();
 loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
@@ -823,7 +824,10 @@ async function renderGame() {
         const jsonResData = await sendUpdate();
         console.log(jsonResData);
         if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-        else newRef = jsonResData.reference;
+        else {
+            newRef = jsonResData.reference;
+            tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+        }
         scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = false;
         gameRound = 0;

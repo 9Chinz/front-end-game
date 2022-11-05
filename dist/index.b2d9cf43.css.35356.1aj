@@ -86,9 +86,24 @@ body #gameCanvas .start-menu .reward-btn button {
   font-size: 1.2em;
 }
 
+body #gameCanvas .start-menu .lower-banner {
+  max-width: 85%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 3vh;
+}
+
+body #gameCanvas .start-menu .lower-banner img {
+  height: 17vh;
+  max-height: 17vh;
+  min-width: 10rem;
+  width: 100%;
+  object-fit: cover;
+  object-position: 0 0;
+}
+
 body #gameCanvas .start-menu .football {
   max-width: 85%;
-  margin-top: 5vh;
   margin-left: auto;
   margin-right: auto;
 }
@@ -244,30 +259,28 @@ body #gameCanvas .game-interface .ui-container .football-score {
 
 body #gameCanvas .final-score-ui {
   width: 100%;
+  background-image: url("Select-Char.af26d599.png");
   flex-direction: column;
   position: absolute;
 }
 
 body #gameCanvas .final-score-ui .token-left {
-  width: 8%;
-  margin: 0 0 0 1rem;
-  padding-top: 3vh;
-  display: flex;
+  width: fit-content;
+  margin-top: 1vh;
+  margin-left: 1rem;
 }
 
 body #gameCanvas .final-score-ui .token-left img {
-  width: 100%;
+  width: 20%;
 }
 
 body #gameCanvas .final-score-ui .token-left p {
-  text-shadow: 2px 4px #5a0713;
+  width: fit-content;
   color: #fff;
   margin: 0;
   font-family: Prompt-Bold;
   font-size: 1.5rem;
   position: absolute;
-  top: 2.8vh;
-  left: 3.5rem;
 }
 
 body #gameCanvas .final-score-ui .score-word {
@@ -301,7 +314,7 @@ body #gameCanvas .final-score-ui .final-score p {
   font-size: 5rem;
   font-style: italic;
   position: absolute;
-  top: 28vh;
+  top: 31vh;
 }
 
 body #gameCanvas .final-score-ui .play-again-btn {
