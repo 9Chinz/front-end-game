@@ -9,7 +9,6 @@
   </head>
   <body>
     <div id="gameCanvas">
-
       <div class="select-char-menu" style="display: none">
         <div class="player-head">
           <h1>PLAYER</h1>
@@ -84,23 +83,7 @@
           <!-- <a href="mcard://mgame/rewards"></a> -->
         </div>
       </div>
-
     </div>
     <script src="/index.c2465e5c.js" defer=""></script>
-    <script>const params = new URLSearchParams(window.location.search), accessToken = params.get("accessToken"), sendUpdate = async ()=>{
-    const res = await fetch("https://penalty-game.com/sendUpdate", {
-        method: "POST",
-        body: JSON.stringify({
-            accessToken: accessToken,
-            point: 10
-        }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }), dataJson = await res.json();
-    console.log(dataJson);
-};
-
-</script>
   </body>
 </html>

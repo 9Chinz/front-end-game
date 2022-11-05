@@ -558,6 +558,8 @@ const startMenu = document.querySelector(".start-menu");
 const goMainGame = document.getElementById("go_main_game");
 const playAgainBtn = document.getElementById("playAgain");
 const scoreDisplayBoard = document.getElementById("score_diplay");
+const params = new URLSearchParams(window.location.search);
+const accessToken = params.get("accessToken");
 const scoreBoard = document.getElementById("score-game");
 const bgGame = new URL(require("d8e3f35c383595e3"));
 let scene, renderer, camera;
@@ -752,7 +754,7 @@ function initPhysics() {
     physicsWorld.addBody(goalKeeperBody);
     const radius = 1;
     sphrBody = new _cannonEs.Body({
-        mass: 1,
+        mass: 5,
         shape: new _cannonEs.Sphere(radius)
     });
     sphrBody.position.set(0, 2, 15);
@@ -813,9 +815,12 @@ function initDebugTool() {
     scene.add(axesHelp);
     cannonDebug = new (0, _cannonEsDebuggerDefault.default)(scene, physicsWorld);
 }
-function renderGame() {
+async function renderGame() {
     // event key
     if (gameRound >= 5) {
+        console.log("one times");
+        const jsonResData = await sendUpdate();
+        if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = true;
         gameRound = 0;
@@ -876,6 +881,19 @@ playAgain.addEventListener("click", ()=>{
     isShoot = false;
     document.querySelector(".final-score-ui").setAttribute("style", "display: none;");
 });
+const sendUpdate = async ()=>{
+    const res = await fetch("https://penalty-game.com/sendUpdate", {
+        method: "POST",
+        body: JSON.stringify({
+            accessToken: accessToken,
+            point: Number(scoreDisplayBoard)
+        }),
+        headers: {
+            "Content-Type": "application/json"
+        }
+    });
+    return res.json();
+};
 
 },{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","5c4ca6b4639d1d51":"fXgSV","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","d8e3f35c383595e3":"9j26s"}],"ktPTu":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
