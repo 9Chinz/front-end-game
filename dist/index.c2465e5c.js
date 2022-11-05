@@ -586,6 +586,7 @@ let totalBall = 5;
 let lockShoot = false;
 let newRef = "";
 let tokenLeft = document.getElementById("token_display");
+let tokenBegin = document.getElementById("token_begin");
 const loadingManage = new _three.LoadingManager();
 loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
@@ -896,17 +897,16 @@ async function renderGame() {
     // console.log(`round ${gameRound}`)
     // event key
     if (gameRound >= 5) {
-        // const jsonResData = await sendUpdate()
-        // console.log(jsonResData)
-        // if (jsonResData.configuration['credit'] <= 0){
-        //     document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
-        // }else{
-        //     newRef = jsonResData.reference
-        //     tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
-        // }
-        scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = false;
         lockShoot = true;
+        const jsonResData = await sendUpdate();
+        console.log(jsonResData);
+        if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
+        else {
+            newRef = jsonResData.reference;
+            tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+        }
+        scoreDisplayBoard.innerHTML = shootSuccess;
         gameRound = 0;
         shootSuccess = 0;
         document.querySelector(".final-score-ui").setAttribute("style", "display: block;");
@@ -980,6 +980,17 @@ const sendUpdate = async ()=>{
     });
     return res.json();
 };
+window.onload = ()=>{
+    tokenBegin.innerHTML = `x${parseJwt(accessToken).configuration["credit"]}`;
+};
+function parseJwt(token) {
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(window.atob(base64).split("").map(function(c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(""));
+    return JSON.parse(jsonPayload);
+}
 
 },{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","5c4ca6b4639d1d51":"fXgSV","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","d8e3f35c383595e3":"9j26s"}],"ktPTu":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
