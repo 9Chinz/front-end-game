@@ -577,6 +577,7 @@ let isShoot = false;
 let shootTime;
 let gameRound = 0;
 let shootSuccess = 0;
+let newRef = "";
 const loadingManage = new _three.LoadingManager();
 loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
@@ -821,6 +822,7 @@ async function renderGame() {
         const jsonResData = await sendUpdate();
         console.log(jsonResData);
         if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
+        else newRef = jsonResData.reference;
         scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = true;
         gameRound = 0;
@@ -886,7 +888,8 @@ const sendUpdate = async ()=>{
         method: "POST",
         body: JSON.stringify({
             accessToken: accessToken,
-            point: shootSuccess
+            point: shootSuccess,
+            newReference: newRef
         }),
         headers: {
             "Content-Type": "application/json"
