@@ -886,7 +886,7 @@ const sendUpdate = async ()=>{
         method: "POST",
         body: JSON.stringify({
             accessToken: accessToken,
-            point: Number(scoreDisplayBoard)
+            point: shootSuccess
         }),
         headers: {
             "Content-Type": "application/json"
