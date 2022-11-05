@@ -817,6 +817,7 @@ function initDebugTool() {
     cannonDebug = new (0, _cannonEsDebuggerDefault.default)(scene, physicsWorld);
 }
 async function renderGame() {
+    // console.log(`round ${gameRound}`)
     // event key
     if (gameRound >= 5) {
         const jsonResData = await sendUpdate();
@@ -824,7 +825,7 @@ async function renderGame() {
         if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
         else newRef = jsonResData.reference;
         scoreDisplayBoard.innerHTML = shootSuccess;
-        isShoot = true;
+        isShoot = false;
         gameRound = 0;
         shootSuccess = 0;
         document.querySelector(".final-score-ui").setAttribute("style", "display: block;");
