@@ -55,11 +55,17 @@ const postOption = {
 }
 
 app.post('/sendUpdate', async (req, res) => {
-    const { accessToken, point } = req.body;
+    const { accessToken, point, newReference } = req.body;
     const {reference, game_id, configuration, iat, exp} = jwt.decode(accessToken);
     
+    let sendRef = reference
+
+    if (newReference){
+        sendRef = newReference
+    }
+    
     const jsonData = {
-        "reference": reference,
+        "reference": sendRef,
         "game_id" : game_id,
         "point" : point
     }
