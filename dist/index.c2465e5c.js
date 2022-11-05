@@ -561,6 +561,7 @@ const scoreDisplayBoard = document.getElementById("score_diplay");
 const params = new URLSearchParams(window.location.search);
 const accessToken = params.get("accessToken");
 const scoreBoard = document.getElementById("score-game");
+const totalBallBoard = document.getElementById("total_ball");
 const bgGame = new URL(require("d8e3f35c383595e3"));
 let scene, renderer, camera;
 let stats, controls, axesHelp, cannonDebug;
@@ -569,14 +570,20 @@ let currentShow;
 let playerList = {};
 let pageName = {};
 let physicsWorld;
-let goalKeeperBody, goalKeeperThree;
+const clock = new _three.Clock();
+let goalKeeperThree;
+let goalMixer;
+let goalAnimations = {};
 let goalBody;
+let goalCurrenBlock;
 let sphrBody, sphrThree;
 let planeThree, groundBody;
 let isShoot = false;
 let shootTime;
 let gameRound = 0;
 let shootSuccess = 0;
+let totalBall = 5;
+let lockShoot = false;
 let newRef = "";
 let tokenLeft = document.getElementById("token_display");
 const loadingManage = new _three.LoadingManager();
@@ -643,6 +650,9 @@ function loadModel(url, key, showNow = false) {
         const model = gltf.scene;
         playerList[key] = model;
         model.position.set(0, -0.4, 0);
+        model.traverse((node)=>{
+            if (node.isMesh) node.castShadow = true;
+        });
         scene.add(model);
         model.visible = false;
         if (showNow) currentShow = key;
@@ -702,6 +712,7 @@ function startGame() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = _three.PCFSoftShadowMap;
+    renderer.outputEncoding = _three.sRGBEncoding;
     document.querySelector("#gameCanvas").appendChild(renderer.domElement);
     pageName["mainGamePage"] = renderer.domElement;
     scene = new _three.Scene();
@@ -709,7 +720,7 @@ function startGame() {
     camera.position.set(0, 9, 30);
     const ambLight = new _three.AmbientLight(0xffffff, 0.1);
     scene.add(ambLight);
-    const spotLight = new _three.SpotLight(0xffffff, 1, 1000, 90);
+    const spotLight = new _three.SpotLight(0xffffff, 1, 1000, 100);
     spotLight.position.set(0, 10, 50);
     spotLight.castShadow = true;
     scene.add(spotLight);
@@ -725,7 +736,7 @@ function initGameSystem() {
 }
 function initPhysics() {
     physicsWorld = new _cannonEs.World({
-        gravity: new _cannonEs.Vec3(0, -9.82, 0)
+        gravity: new _cannonEs.Vec3(0, -20, 0)
     });
     groundBody = new _cannonEs.Body({
         type: _cannonEs.Body.STATIC,
@@ -749,14 +760,14 @@ function initPhysics() {
         shootSuccess += 1;
         scoreBoard.innerHTML = shootSuccess;
     });
-    goalKeeperBody = new _cannonEs.Body({
-        shape: new _cannonEs.Box(new _cannonEs.Vec3(2, 20, 1))
+    goalCurrenBlock = new _cannonEs.Body({
+        shape: new _cannonEs.Box(new _cannonEs.Vec3(3, 3, 2))
     });
-    goalKeeperBody.position.set(0, 0, -38);
-    physicsWorld.addBody(goalKeeperBody);
+    goalCurrenBlock.position.set(0, 14, -38);
+    physicsWorld.addBody(goalCurrenBlock);
     const radius = 1;
     sphrBody = new _cannonEs.Body({
-        mass: 5,
+        mass: 100,
         shape: new _cannonEs.Sphere(radius)
     });
     sphrBody.position.set(0, 2, 15);
@@ -764,10 +775,6 @@ function initPhysics() {
 }
 function initGameObj() {
     const txLoader = new _three.TextureLoader();
-    // const planeGeo = new THREE.PlaneGeometry(10, 20, 5, 10)
-    // const planeMat = new THREE.MeshPhysicalMaterial({})
-    // planeThree = new THREE.Mesh(planeGeo, planeMat)
-    // scene.add(planeThree)
     const footballUrl = new URL(require("5c4ca6b4639d1d51"));
     txLoader.load(footballUrl.href, (txt)=>{
         const sphrGeo = new _three.SphereGeometry(1);
@@ -781,34 +788,102 @@ function initGameObj() {
     assetLoader = new (0, _gltfloaderJs.GLTFLoader)();
     assetLoader.load(GoalUrl.href, (gltf)=>{
         goalKeeperThree = gltf.scene;
-        const goalScale = 9;
+        const goalScale = 7;
         goalKeeperThree.scale.set(goalScale, goalScale, goalScale);
+        goalKeeperThree.traverse((node)=>{
+            if (node.isMesh) node.castShadow = true;
+        });
+        goalKeeperThree.position.set(0, 0, -38);
         scene.add(goalKeeperThree);
+        goalMixer = new _three.AnimationMixer(goalKeeperThree);
+        gltf.animations.forEach((clips)=>{
+            goalAnimations[clips.name] = goalMixer.clipAction(clips);
+            goalAnimations[clips.name].loop = _three.LoopOnce;
+        });
     });
 }
 function initGameControl() {
     // controls = new OrbitControls(camera, pageName['mainGamePage'])
     // controls.update()
     var el = pageName["mainGamePage"];
-    const BALLSPEED = -60;
+    const BALLSPEED = -45;
     (0, _swipeControlsJsDefault.default)(el, function(swipedir) {
         console.log(swipedir);
-        if (!isShoot) {
-            if (swipedir == "up") {
-                sphrBody.velocity.set(0, 12, BALLSPEED);
+        if (!isShoot && !lockShoot) switch(swipedir){
+            case "fastTop":
+                randomBlockPosition();
+                sphrBody.velocity.set(0, 28, BALLSPEED * 2);
                 isShoot = true;
                 shootTime = new Date().getTime();
-            } else if (swipedir == "upLeft") {
-                sphrBody.velocity.set(-18, 12, BALLSPEED);
+                break;
+            case "fastLeft":
+                randomBlockPosition();
+                sphrBody.velocity.set(-28, 25, BALLSPEED * 2);
                 isShoot = true;
                 shootTime = new Date().getTime();
-            } else if (swipedir == "upRight") {
-                sphrBody.velocity.set(18, 12, BALLSPEED);
+                break;
+            case "slowLeft":
+                randomBlockPosition();
+                sphrBody.velocity.set(-22, 10, BALLSPEED * 1.4);
                 isShoot = true;
                 shootTime = new Date().getTime();
-            }
+                break;
+            case "fastRight":
+                randomBlockPosition();
+                sphrBody.velocity.set(28, 25, BALLSPEED * 2);
+                isShoot = true;
+                shootTime = new Date().getTime();
+                break;
+            case "slowRight":
+                randomBlockPosition();
+                sphrBody.velocity.set(22, 10, BALLSPEED * 1.4);
+                isShoot = true;
+                shootTime = new Date().getTime();
+                break;
+            default:
+                console.log("try again");
+                break;
         }
     });
+}
+function randomBlockPosition() {
+    const blockPosition = [
+        "TopMiddle",
+        "TopRight",
+        "Right",
+        "TopLeft",
+        "Left"
+    ];
+    const getBlockPosition = blockPosition[Math.floor(Math.random() * blockPosition.length)];
+    console.log(`now block ${getBlockPosition}`);
+    switch(getBlockPosition){
+        case "TopMiddle":
+            goalAnimations["TopMiddle"].play();
+            goalAnimations["TopMiddle"].reset();
+            goalCurrenBlock.position.set(0, 14, -38);
+            break;
+        case "TopRight":
+            goalAnimations["TopRight"].play();
+            goalAnimations["TopRight"].reset();
+            goalCurrenBlock.position.set(-14, 14, -38);
+            break;
+        case "Right":
+            goalAnimations["Right"].play();
+            goalAnimations["Right"].reset();
+            goalCurrenBlock.position.set(-14, 2, -38);
+            break;
+        case "TopLeft":
+            goalAnimations["TopLeft"].play();
+            goalAnimations["TopLeft"].reset();
+            goalCurrenBlock.position.set(14, 14, -38);
+            break;
+        case "Left":
+            goalAnimations["Left"].play();
+            goalAnimations["Left"].reset();
+            goalCurrenBlock.position.set(14, 2, -38);
+            break;
+    }
+    physicsWorld.addBody(goalCurrenBlock);
 }
 function initDebugTool() {
     stats = new (0, _statsModuleDefault.default)();
@@ -821,23 +896,28 @@ async function renderGame() {
     // console.log(`round ${gameRound}`)
     // event key
     if (gameRound >= 5) {
-        const jsonResData = await sendUpdate();
-        console.log(jsonResData);
-        if (jsonResData.configuration["credit"] <= 0) document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-        else {
-            newRef = jsonResData.reference;
-            tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
-        }
+        // const jsonResData = await sendUpdate()
+        // console.log(jsonResData)
+        // if (jsonResData.configuration['credit'] <= 0){
+        //     document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
+        // }else{
+        //     newRef = jsonResData.reference
+        //     tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
+        // }
         scoreDisplayBoard.innerHTML = shootSuccess;
         isShoot = false;
+        lockShoot = true;
         gameRound = 0;
         shootSuccess = 0;
         document.querySelector(".final-score-ui").setAttribute("style", "display: block;");
     }
     if (isShoot) {
-        if (new Date().getTime() - shootTime >= 3000) {
+        if (new Date().getTime() - shootTime >= 2500) {
             isShoot = false;
+            totalBall -= 1;
             gameRound += 1;
+            physicsWorld.removeBody(goalCurrenBlock);
+            totalBallBoard.innerHTML = totalBall;
             sphrBody.position.set(0, 2, 15);
             sphrBody.interpolatedPosition.setZero();
             sphrBody.initPosition.setZero();
@@ -851,22 +931,17 @@ async function renderGame() {
     // if have three with cannon
     // position of obj in three copy position obj of cannon
     if (sphrThree) {
+        // if ball loaded
         sphrThree.position.copy(sphrBody.position);
         sphrThree.quaternion.copy(sphrBody.quaternion);
     }
-    if (goalKeeperThree) {
-        goalKeeperThree.position.copy(goalKeeperBody.position);
-        goalKeeperThree.quaternion.copy(goalKeeperBody.quaternion);
-    }
-    // if (planeThree) {
-    //     planeThree.position.copy(groundBody.position)
-    //     planeThree.quaternion.copy(groundBody.quaternion)
-    // }
+    if (goalKeeperThree) // if goal loaded
+    goalMixer.update(clock.getDelta());
     physicsWorld.fixedStep();
     // for debug physics
-    //cannonDebug.update()
+    // cannonDebug.update()
     renderer.render(scene, camera);
-    //stats.update()
+    // stats.update()
     requestAnimationFrame(renderGame);
 }
 // control menu
@@ -885,7 +960,10 @@ goMainGame.addEventListener("click", ()=>{
 });
 playAgain.addEventListener("click", ()=>{
     scoreBoard.innerHTML = 0;
+    totalBallBoard.innerHTML = 5;
+    totalBall = 5;
     isShoot = false;
+    lockShoot = false;
     document.querySelector(".final-score-ui").setAttribute("style", "display: none;");
 });
 const sendUpdate = async ()=>{
@@ -42568,11 +42646,10 @@ function CannonDebugger(scene, world, _temp) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 function swipedetect(el, callback) {
-    var touchsurface = el, swipedir, startX, startY, distX, distY, threshold = 25, restraint = 100, allowedTime = 300, elapsedTime, startTime, handleswipe = callback || function(swipedir) {};
+    var touchsurface = el, swipedir, startX, startY, distX, distY, angle, speed, threshold = 25, restraint = 100, allowedTime = 300, elapsedTime, startTime, handleswipe = callback || function(swipedir) {};
     touchsurface.addEventListener("touchstart", function(e) {
         var touchobj = e.changedTouches[0];
         swipedir = "none";
-        dist = 0;
         startX = touchobj.pageX;
         startY = touchobj.pageY;
         startTime = new Date().getTime() // record time when finger first makes contact with surface
@@ -42591,13 +42668,23 @@ function swipedetect(el, callback) {
         ;
         elapsedTime = new Date().getTime() - startTime // get time elapsed
         ;
-        console.log(`x${distX} ${distY}`);
+        angle = Math.atan(distY / distX);
+        speed = Math.sqrt(Math.pow(distX, 2) + Math.pow(distY, 2)) / elapsedTime;
+        console.log(`x${distX} y${distY}`);
+        console.log(`angle ${angle}`);
+        console.log(`speed ${speed}`);
         if (elapsedTime <= allowedTime) {
             if (Math.abs(distY) >= threshold && Math.abs(distX) <= restraint) {
-                swipedir = distY < 0 ? "up" : "down" // if dist traveled is negative, it indicates up swipe
-                ;
-                if (distX < -50) swipedir = "upLeft";
-                else if (distX > 50) swipedir = "upRight";
+                if (Math.abs(distY) >= 0) {
+                    if (Math.abs(angle) >= 1.3) swipedir = "fastTop";
+                    else if (angle > 0.7) {
+                        if (speed >= 0.7) swipedir = "fastLeft";
+                        else swipedir = "slowLeft";
+                    } else if (angle < -0.7) {
+                        if (speed >= 0.7) swipedir = "fastRight";
+                        else swipedir = "slowRight";
+                    }
+                }
             }
         }
         handleswipe(swipedir);

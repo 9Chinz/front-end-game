@@ -220,26 +220,36 @@ body #gameCanvas .select-char-menu .main-game-btn button {
 }
 
 body #gameCanvas .game-interface {
-  color: red;
   position: absolute;
-  top: 90%;
+  top: 93vh;
 }
 
 body #gameCanvas .game-interface .ui-container {
-  width: 100%;
+  color: #fff;
+  text-shadow: 2px 4px #5a0713;
+  margin: 0 0 0 1rem;
+  font-family: Prompt-Bold;
+  display: flex;
 }
 
-body #gameCanvas .game-interface .ui-container .football {
+body #gameCanvas .game-interface .ui-container img {
   width: 10%;
+  height: 10%;
 }
 
-body #gameCanvas .game-interface .ui-container .football img {
-  width: 100%;
+body #gameCanvas .game-interface .ui-container .total-ball {
+  margin: .5vh 0 0 .6rem;
+  font-size: 1.5rem;
+}
+
+body #gameCanvas .game-interface .ui-container .score-word {
+  margin: .5vh 0 0 12.5rem;
+  font-size: 1.5rem;
 }
 
 body #gameCanvas .game-interface .ui-container .football-score {
-  font-family: Prompt-Bold;
-  font-size: 1.2rem;
+  margin: .5vh 0 0 .5rem;
+  font-size: 1.5rem;
 }
 
 body #gameCanvas .final-score-ui {
