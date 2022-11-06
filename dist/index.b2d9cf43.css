@@ -239,7 +239,32 @@ body #gameCanvas .select-char-menu .main-game-btn button {
 
 body #gameCanvas .game-interface {
   position: absolute;
-  top: 93vh;
+  top: 56vh;
+}
+
+body #gameCanvas .game-interface .goal-show {
+  flex-direction: column;
+  place-items: center;
+  margin: 0 auto;
+  display: flex;
+}
+
+body #gameCanvas .game-interface .goal-show .goalWord {
+  width: 90%;
+}
+
+body #gameCanvas .game-interface .goal-show .goalBg {
+  width: 50%;
+  margin-top: 2vh;
+}
+
+body #gameCanvas .game-interface .goal-show p {
+  color: #fff;
+  margin: 7.2vh 0 0;
+  font-family: Prompt-Bold;
+  font-size: 3.8rem;
+  font-style: italic;
+  position: absolute;
 }
 
 body #gameCanvas .game-interface .ui-container {
@@ -248,6 +273,8 @@ body #gameCanvas .game-interface .ui-container {
   margin: 0 0 0 1rem;
   font-family: Prompt-Bold;
   display: flex;
+  position: absolute;
+  top: 38vh;
 }
 
 body #gameCanvas .game-interface .ui-container img {
@@ -256,18 +283,18 @@ body #gameCanvas .game-interface .ui-container img {
 }
 
 body #gameCanvas .game-interface .ui-container .total-ball {
-  margin: .5vh 0 0 .6rem;
-  font-size: 1.5rem;
+  margin: .3vh 0 0 .6rem;
+  font-size: 1.5em;
 }
 
 body #gameCanvas .game-interface .ui-container .score-word {
   margin: .5vh 0 0 12.5rem;
-  font-size: 1.5rem;
+  font-size: 1.5em;
 }
 
 body #gameCanvas .game-interface .ui-container .football-score {
   margin: .5vh 0 0 .5rem;
-  font-size: 1.5rem;
+  font-size: 1.5em;
 }
 
 body #gameCanvas .final-score-ui {

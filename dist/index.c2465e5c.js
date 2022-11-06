@@ -543,6 +543,27 @@ var _cannonEsDebugger = require("cannon-es-debugger");
 var _cannonEsDebuggerDefault = parcelHelpers.interopDefault(_cannonEsDebugger);
 var _swipeControlsJs = require("./js/swipeControls.js");
 var _swipeControlsJsDefault = parcelHelpers.interopDefault(_swipeControlsJs);
+const argenUrl = new URL(require("58848d0079a09d57"));
+const belgiumUrl = new URL(require("7c1ef81311401fad"));
+const brazilUrl = new URL(require("55b72701edf72064"));
+const englandUrl = new URL(require("ccd19c951c0d4e42"));
+const franceUrl = new URL(require("48d455e429887941"));
+const portugalUrl = new URL(require("6c31ed40044bc293"));
+const qatarUrl = new URL(require("5b58ffaaa81606fd"));
+const spainUrl = new URL(require("394cdb9504b215c7"));
+const playerUrls = {
+    "argen": argenUrl,
+    "belgium": belgiumUrl,
+    "brazil": brazilUrl,
+    "england": englandUrl,
+    "france": franceUrl,
+    "portugal": portugalUrl,
+    "qatar": qatarUrl,
+    "spain": spainUrl
+};
+const hitFootBallUrl = new URL(require("d0f7b248e4bf39a3"));
+const failSoundUrl = new URL(require("5c555afdcf310d9c"));
+const winSoundUrl = new URL(require("4df743630a86dc33"));
 const btnArgen = document.getElementById("load_argen");
 const btnBelgium = document.getElementById("load_belgium");
 const btnBrazil = document.getElementById("load_brazil");
@@ -561,16 +582,20 @@ const scoreDisplayBoard = document.getElementById("score_diplay");
 const params = new URLSearchParams(window.location.search);
 const accessToken = params.get("accessToken");
 const scoreBoard = document.getElementById("score-game");
+const scorePerRound = document.getElementById("score_diplay_round");
 const totalBallBoard = document.getElementById("total_ball");
+const goalBoard = document.querySelector(".goal-show");
 const bgGame = new URL(require("d8e3f35c383595e3"));
 let scene, renderer, camera;
 let stats, controls, axesHelp, cannonDebug;
 let assetLoader;
 let currentShow;
 let playerList = {};
+let playerCurrentUrlKey = "argen";
 let pageName = {};
 let physicsWorld;
 const clock = new _three.Clock();
+let playerThree, playerMixer, playerAnimations = {};
 let goalKeeperThree;
 let goalMixer;
 let goalAnimations = {};
@@ -587,6 +612,8 @@ let lockShoot = false;
 let newRef = "";
 let tokenLeft = document.getElementById("token_display");
 let tokenBegin = document.getElementById("token_begin");
+const audioLoader = new _three.AudioLoader();
+let kickSound, winSound, failSound;
 const loadingManage = new _three.LoadingManager();
 loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
@@ -636,14 +663,14 @@ function windowResize() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
 function initObject() {
-    loadModel(new URL(require("58848d0079a09d57")), "argen", true);
-    loadModel(new URL(require("7c1ef81311401fad")), "belgium");
-    loadModel(new URL(require("55b72701edf72064")), "brazil");
-    loadModel(new URL(require("ccd19c951c0d4e42")), "england");
-    loadModel(new URL(require("48d455e429887941")), "france");
-    loadModel(new URL(require("6c31ed40044bc293")), "portugal");
-    loadModel(new URL(require("5b58ffaaa81606fd")), "qatar");
-    loadModel(new URL(require("394cdb9504b215c7")), "spain");
+    loadModel(argenUrl, "argen", true);
+    loadModel(belgiumUrl, "belgium");
+    loadModel(brazilUrl, "brazil");
+    loadModel(englandUrl, "england");
+    loadModel(franceUrl, "france");
+    loadModel(portugalUrl, "portugal");
+    loadModel(qatarUrl, "qatar");
+    loadModel(spainUrl, "spain");
 }
 function loadModel(url, key, showNow = false) {
     assetLoader = new (0, _gltfloaderJs.GLTFLoader)(loadingManage);
@@ -696,6 +723,7 @@ function animate() {
     // event key
     if (currentShow) {
         playerList[currentShow].visible = true;
+        playerCurrentUrlKey = currentShow;
         for(let char in playerList)if (char != currentShow) playerList[char].visible = false;
         currentShow = undefined;
     }
@@ -726,6 +754,11 @@ function startGame() {
     spotLight.castShadow = true;
     scene.add(spotLight);
     window.addEventListener("resize", windowResize);
+    const listener = new _three.AudioListener();
+    camera.add(listener);
+    kickSound = new _three.Audio(listener);
+    winSound = new _three.Audio(listener);
+    failSound = new _three.Audio(listener);
     initGameSystem();
     renderGame();
 }
@@ -733,7 +766,26 @@ function initGameSystem() {
     initPhysics();
     initGameObj();
     initGameControl();
+    initSound();
 //initDebugTool()
+}
+function initSound() {
+    const VOLUME = 0.4;
+    audioLoader.load(hitFootBallUrl.href, (buffer)=>{
+        kickSound.setBuffer(buffer);
+        kickSound.setLoop(false);
+        kickSound.setVolume(VOLUME);
+    });
+    audioLoader.load(winSoundUrl.href, (buffer)=>{
+        winSound.setBuffer(buffer);
+        winSound.setLoop(false);
+        winSound.setVolume(VOLUME);
+    });
+    audioLoader.load(failSoundUrl.href, (buffer)=>{
+        failSound.setBuffer(buffer);
+        failSound.setLoop(false);
+        failSound.setVolume(VOLUME);
+    });
 }
 function initPhysics() {
     physicsWorld = new _cannonEs.World({
@@ -758,11 +810,17 @@ function initPhysics() {
     goalBody.position.set(0, 5, -42);
     physicsWorld.addBody(goalBody);
     goalBody.addEventListener("collide", ()=>{
+        winSound.play();
         shootSuccess += 1;
         scoreBoard.innerHTML = shootSuccess;
+        scorePerRound.innerHTML = shootSuccess;
+        goalBoard.setAttribute("style", "display:flex");
     });
     goalCurrenBlock = new _cannonEs.Body({
         shape: new _cannonEs.Box(new _cannonEs.Vec3(3, 3, 2))
+    });
+    goalCurrenBlock.addEventListener("collide", ()=>{
+        failSound.play();
     });
     goalCurrenBlock.position.set(0, 14, -38);
     physicsWorld.addBody(goalCurrenBlock);
@@ -772,11 +830,12 @@ function initPhysics() {
         shape: new _cannonEs.Sphere(radius)
     });
     sphrBody.position.set(0, 2, 15);
+    sphrBody.quaternion.setFromEuler(0, Math.PI - 0.4, 0);
     physicsWorld.addBody(sphrBody);
 }
 function initGameObj() {
     const txLoader = new _three.TextureLoader();
-    const footballUrl = new URL(require("5c4ca6b4639d1d51"));
+    const footballUrl = new URL(require("647bda67cd6532cf"));
     txLoader.load(footballUrl.href, (txt)=>{
         const sphrGeo = new _three.SphereGeometry(1);
         const sphrMat = new _three.MeshPhysicalMaterial({
@@ -802,6 +861,23 @@ function initGameObj() {
             goalAnimations[clips.name].loop = _three.LoopOnce;
         });
     });
+    assetLoader.load(playerUrls[playerCurrentUrlKey].href, (gltf)=>{
+        playerThree = gltf.scene;
+        const playerScale = 3.5;
+        playerThree.scale.set(playerScale, playerScale, playerScale);
+        playerThree.traverse((node)=>{
+            if (node.isMesh) node.castShadow = true;
+        });
+        playerThree.position.set(0, 2, 19);
+        playerThree.rotation.y = Math.PI;
+        scene.add(playerThree);
+        playerThree.visible = false;
+        playerMixer = new _three.AnimationMixer(playerThree);
+        gltf.animations.forEach((clips)=>{
+            playerAnimations[clips.name] = playerMixer.clipAction(clips);
+            playerAnimations[clips.name].loop = _three.LoopOnce;
+        });
+    });
 }
 function initGameControl() {
     // controls = new OrbitControls(camera, pageName['mainGamePage'])
@@ -812,34 +888,59 @@ function initGameControl() {
         console.log(swipedir);
         if (!isShoot && !lockShoot) switch(swipedir){
             case "fastTop":
-                randomBlockPosition();
-                sphrBody.velocity.set(0, 28, BALLSPEED * 2);
-                isShoot = true;
-                shootTime = new Date().getTime();
+                setTimeout(()=>{
+                    kickSound.play();
+                    randomBlockPosition();
+                    sphrBody.velocity.set(0, 28, BALLSPEED * 2);
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    playerThree.visible = false;
+                }, 800);
+                playHardKick();
                 break;
             case "fastLeft":
-                randomBlockPosition();
-                sphrBody.velocity.set(-28, 25, BALLSPEED * 2);
-                isShoot = true;
-                shootTime = new Date().getTime();
+                setTimeout(()=>{
+                    kickSound.play();
+                    randomBlockPosition();
+                    sphrBody.velocity.set(-28, 25, BALLSPEED * 2);
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    playerThree.visible = false;
+                }, 800);
+                playHardKick();
                 break;
             case "slowLeft":
-                randomBlockPosition();
-                sphrBody.velocity.set(-22, 10, BALLSPEED * 1.4);
-                isShoot = true;
-                shootTime = new Date().getTime();
+                setTimeout(()=>{
+                    kickSound.play();
+                    randomBlockPosition();
+                    sphrBody.velocity.set(-22, 10, BALLSPEED * 1.4);
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    playerThree.visible = false;
+                }, 800);
+                playHardKick();
                 break;
             case "fastRight":
-                randomBlockPosition();
-                sphrBody.velocity.set(28, 25, BALLSPEED * 2);
-                isShoot = true;
-                shootTime = new Date().getTime();
+                setTimeout(()=>{
+                    kickSound.play();
+                    randomBlockPosition();
+                    sphrBody.velocity.set(28, 25, BALLSPEED * 2);
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    playerThree.visible = false;
+                }, 800);
+                playHardKick();
                 break;
             case "slowRight":
-                randomBlockPosition();
-                sphrBody.velocity.set(22, 10, BALLSPEED * 1.4);
-                isShoot = true;
-                shootTime = new Date().getTime();
+                setTimeout(()=>{
+                    kickSound.play();
+                    randomBlockPosition();
+                    sphrBody.velocity.set(22, 10, BALLSPEED * 1.4);
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    playerThree.visible = false;
+                }, 800);
+                playHardKick();
                 break;
             default:
                 console.log("try again");
@@ -847,6 +948,16 @@ function initGameControl() {
         }
     });
 }
+function playHardKick() {
+    playerThree.visible = true;
+    playerAnimations["HardKick"].play();
+    playerAnimations["HardKick"].reset();
+}
+// function playSoftKick() {
+//     playerThree.visible = true
+//     playerAnimations['SoftKick'].play()
+//     playerAnimations['SoftKick'].reset()
+// }
 function randomBlockPosition() {
     const blockPosition = [
         "TopMiddle",
@@ -913,12 +1024,14 @@ async function renderGame() {
     }
     if (isShoot) {
         if (new Date().getTime() - shootTime >= 2500) {
+            goalBoard.setAttribute("style", "display:none");
             isShoot = false;
             totalBall -= 1;
             gameRound += 1;
             physicsWorld.removeBody(goalCurrenBlock);
             totalBallBoard.innerHTML = totalBall;
             sphrBody.position.set(0, 2, 15);
+            sphrBody.quaternion.setFromEuler(0, Math.PI - 0.4, 0);
             sphrBody.interpolatedPosition.setZero();
             sphrBody.initPosition.setZero();
             sphrBody.velocity.setZero();
@@ -935,8 +1048,10 @@ async function renderGame() {
         sphrThree.position.copy(sphrBody.position);
         sphrThree.quaternion.copy(sphrBody.quaternion);
     }
+    const deltaTime = clock.getDelta();
     if (goalKeeperThree) // if goal loaded
-    goalMixer.update(clock.getDelta());
+    goalMixer.update(deltaTime);
+    if (playerThree) playerMixer.update(deltaTime);
     physicsWorld.fixedStep();
     // for debug physics
     // cannonDebug.update()
@@ -992,7 +1107,7 @@ function parseJwt(token) {
     return JSON.parse(jsonPayload);
 }
 
-},{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","5c4ca6b4639d1d51":"fXgSV","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","d8e3f35c383595e3":"9j26s"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","d8e3f35c383595e3":"9j26s","647bda67cd6532cf":"2Z8nk","d0f7b248e4bf39a3":"ckX8Y","5c555afdcf310d9c":"6QfkP","4df743630a86dc33":"7RB4V"}],"ktPTu":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ACESFilmicToneMapping", ()=>ACESFilmicToneMapping);
@@ -42762,14 +42877,23 @@ module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "FootBa
 },{"./helpers/bundle-url":"25lHr"}],"9sCeD":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "FootBall_Player_Spain.116fd6b3.glb" + "?" + Date.now();
 
-},{"./helpers/bundle-url":"25lHr"}],"fXgSV":[function(require,module,exports) {
-module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "FootBall.aac44c8e.png" + "?" + Date.now();
-
 },{"./helpers/bundle-url":"25lHr"}],"2n4ZN":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "GoalKeeper_v2.e42d512c.glb" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"25lHr"}],"9j26s":[function(require,module,exports) {
 module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "BG-Gaol.50cd5575.jpg" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"25lHr"}],"2Z8nk":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "Soccer Skin.e9102191.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"25lHr"}],"ckX8Y":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "hitFootball.b94aeeb6.wav" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"25lHr"}],"6QfkP":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "failSound.b01d144e.mp3" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"25lHr"}],"7RB4V":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "winSound.b61ec353.mp3" + "?" + Date.now();
 
 },{"./helpers/bundle-url":"25lHr"}]},["ilxF6","4g5fn"], "4g5fn", "parcelRequiree7db")
 
