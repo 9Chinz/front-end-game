@@ -12,9 +12,9 @@ const jwtStrategy = require('passport-jwt').Strategy;
 const passport = require('passport');
 const exp = require('constants');
 
-const dotEnv = require('dotenv').config();
-const SECRET_KEY = process.env.TOKEN_SECRET;
-const GAME_ID = process.env.GAME_ID;
+const config =  require('./config.js');
+const SECRET_KEY = config.TOKEN_SECRET;
+const GAME_ID = config.GAME_ID;
 
 const jwtOption = {
     jwtFromRequest: jwtExtractor.fromUrlQueryParameter("accessToken"),
@@ -48,9 +48,9 @@ const postOption = {
     headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
-        'x-client-id': 'a1d2addfc8e27bc8ac6fb3ffc',
-        'x-client-secret': '$2y$10$cKGKGF6pUJgA/E2xHTk5OeGqSAGuVvyeb5/6WCaYzXmeCz3EpdE0a',
-        'x-app-id': 'MG002'
+        'x-client-id': config.X_CLIENT_ID_MCARD,
+        'x-client-secret': config.X_CLIENT_SECRET_MCARD,
+        'x-app-id': config.X_APP_ID
     }
 }
 
@@ -71,7 +71,7 @@ app.post('/sendUpdate', async (req, res) => {
     }
 
     try {
-        let result = await axios.post('https://uat-app.mcardmall.com/api/gamification/v1/update-result', jsonData, postOption);
+        let result = await axios.post(`${config.API_ENDPOINT_MCARD}/api/gamification/v1/update-result`, jsonData, postOption);
         res.status(200).json(result.data);
     } catch (err) {
         res.send(err.response.data);
@@ -79,4 +79,4 @@ app.post('/sendUpdate', async (req, res) => {
     
 });
 
-app.listen(PORT, () => { console.log(`listening on port: http://localhost:${PORT}`) });
+app.listen(PORT, () => { console.log(`listening on port: http://localhost:${PORT} | env ${config.NODE_ENV}`) });
