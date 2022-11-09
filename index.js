@@ -10,7 +10,6 @@ const jwt = require('jsonwebtoken');
 const jwtExtractor = require('passport-jwt').ExtractJwt;
 const jwtStrategy = require('passport-jwt').Strategy;
 const passport = require('passport');
-const exp = require('constants');
 
 const config =  require('./config.js');
 const SECRET_KEY = config.TOKEN_SECRET;
@@ -24,8 +23,10 @@ const jwtOption = {
 const jwtAuth = new jwtStrategy(jwtOption, (payload, done) => {    
     // check statue ment to open game
     if (payload.game_id !== GAME_ID){
+        console.log(`allow game page: game id is ${payload.game_id}`)
         return done(null, false);
     }else{
+        console.log(`not allow game page: game id is ${payload.game_id}`)
         return done(null, true);
     }
 });
@@ -39,6 +40,7 @@ app.use(express.json());
 
 
 app.get('/', middlewareGame, (req, res) => {
+    console.log(`get game page success`)
     res.sendFile(path.join(__dirname+'/dist/index.html'))
 });
 
@@ -72,8 +74,10 @@ app.post('/sendUpdate', async (req, res) => {
 
     try {
         let result = await axios.post(`${config.API_ENDPOINT_MCARD}/api/gamification/v1/update-result`, jsonData, postOption);
+        console.log(`update success {${config.NODE_ENV}}: at ${config.API_ENDPOINT_MCARD} | ${jsonData} | ${postOption}`)
         res.status(200).json(result.data);
     } catch (err) {
+        console.log(`error ${err.response.data}`)
         res.send(err.response.data);
     }
     
