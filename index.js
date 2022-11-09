@@ -74,8 +74,9 @@ app.post('/sendUpdate', async (req, res) => {
     }
 
     try {
+        const timestamp = new Date().toLocaleString('th-Th', { timeZone: 'Asia/Bangkok' }) 
         let result = await axios.post(`${config.API_ENDPOINT_MCARD}/api/gamification/v1/update-result`, jsonData, postOption);
-        console.log(`update success {${config.NODE_ENV}}: at ${config.API_ENDPOINT_MCARD} | ${JSON.stringify(jsonData)} | ${JSON.stringify(postOption)}`)
+        console.log(`${timestamp} update success {${config.NODE_ENV}}: at ${config.API_ENDPOINT_MCARD} | ${JSON.stringify(jsonData)} | ${JSON.stringify(postOption)}`)
         res.status(200).json(result.data);
     } catch (err) {
         console.log(`error ${err.response.data}`)
