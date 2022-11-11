@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express();
-const PORT = 3001
 
 const path = require('path');
 
@@ -41,7 +40,8 @@ app.use(express.json());
 
 
 app.get('/', middlewareGame, (req, res) => {
-    console.log(`get game page success`)
+    const timestamp = new Date().toLocaleString('th-Th', { timeZone: 'Asia/Bangkok' })   
+    console.log(`${timestamp} get game page success`)
     res.sendFile(path.join(__dirname+'/dist/index.html'))
 });
 
@@ -85,4 +85,4 @@ app.post('/sendUpdate', async (req, res) => {
     
 });
 
-app.listen(PORT, () => { console.log(`listening on port: http://localhost:${PORT} | env ${config.NODE_ENV}`) });
+app.listen(config.PORT, () => { console.log(`listening on port: http://localhost:${config.PORT} | env ${config.NODE_ENV}`) });
