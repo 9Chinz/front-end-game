@@ -9,7 +9,9 @@
 }
 
 body {
-  margin: 0;
+  max-width: 500px;
+  max-height: 1000px;
+  margin: 0 auto;
 }
 
 body #gameCanvas {
@@ -22,7 +24,7 @@ body #gameCanvas {
 
 body #gameCanvas .start-menu {
   height: 100vh;
-  width: 100%;
+  width: 100vw;
   background-image: url("Main-Menu.fbb3f808.png");
   background-position: center;
   background-repeat: no-repeat;
@@ -31,7 +33,7 @@ body #gameCanvas .start-menu {
 }
 
 body #gameCanvas .start-menu .token-left {
-  margin: 2vh 0 0 1rem;
+  margin: 2vh 0 0 5vw;
   display: flex;
 }
 
@@ -43,13 +45,13 @@ body #gameCanvas .start-menu .token-left img {
 body #gameCanvas .start-menu .token-left p {
   text-shadow: 2px 4px #5a0713;
   color: #fff;
-  margin: .3vh 0 0 .5rem;
+  margin: .3vh 0 0 2.5vw;
   font-family: Prompt-Bold;
   font-size: 1.5rem;
 }
 
 body #gameCanvas .start-menu .visa-logo {
-  max-width: 65%;
+  max-width: 65vw;
   margin-left: auto;
   margin-right: auto;
   padding-top: 4.5vh;
@@ -82,42 +84,44 @@ body #gameCanvas .start-menu .play-btn {
 body #gameCanvas .start-menu .play-btn button {
   color: #fff;
   background-color: #d12020;
-  border-radius: 35px;
-  padding: 1vh 3rem;
+  border-radius: 6vw;
+  padding: .5vh 16vw;
   font-family: Prompt-Bold;
-  font-size: 1.2em;
+  font-size: 6vw;
 }
 
 body #gameCanvas .start-menu .reward-btn {
-  width: fit-content;
+  width: 100%;
+  justify-content: center;
   margin-left: auto;
   margin-right: auto;
   padding-top: 2vh;
+  display: flex;
 }
 
 body #gameCanvas .start-menu .reward-btn button {
   color: #fff;
   background-color: #d12020;
-  border-radius: 35px;
-  padding: 1vh 1rem;
+  border-radius: 6vw;
+  padding: .5vh 5vw;
   font-family: Prompt-Bold;
-  font-size: 1.2em;
+  font-size: 6vw;
 }
 
 body #gameCanvas .start-menu .banner-lower {
-  max-width: 90%;
+  max-width: 85%;
   margin-left: auto;
   margin-right: auto;
-  padding-top: 4.5vh;
+  padding-top: 3.5vh;
 }
 
 body #gameCanvas .start-menu .banner-lower img {
-  width: 100%;
+  width: 85vw;
 }
 
 body #gameCanvas .start-menu .football {
-  max-width: 70%;
-  margin-top: 2.5vh;
+  max-width: 60%;
+  margin-top: 4.5vh;
   margin-left: auto;
   margin-right: auto;
 }
@@ -149,6 +153,57 @@ body #gameCanvas .loading-menu .fifa-logo img {
   width: 100%;
 }
 
+body #gameCanvas .tutorial-page {
+  width: 100vw;
+  height: 100vh;
+  background-image: url("Main-Menu.fbb3f808.png");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2.5vh;
+  margin: 0 auto;
+  display: flex;
+  position: absolute;
+}
+
+body #gameCanvas .tutorial-page .header-img {
+  width: 100vw;
+  justify-content: center;
+  display: flex;
+}
+
+body #gameCanvas .tutorial-page .header-img img {
+  width: 85vw;
+}
+
+body #gameCanvas .tutorial-page .skip-tutorial {
+  z-index: 1;
+  width: 10vw;
+  height: 5vh;
+  position: absolute;
+  top: 11vh;
+  right: 3vw;
+}
+
+body #gameCanvas .tutorial-page .skip-tutorial img {
+  width: 100%;
+  height: 100%;
+}
+
+body #gameCanvas .tutorial-page .splide {
+  width: 100vw;
+  height: 80vh;
+  margin: 0 auto;
+}
+
+body #gameCanvas .tutorial-page .splide img {
+  width: 100%;
+  height: 100%;
+}
+
 body #gameCanvas .select-char-menu {
   width: 100%;
   object-fit: cover;
@@ -158,24 +213,45 @@ body #gameCanvas .select-char-menu {
   background-size: 100% 100%;
 }
 
+body #gameCanvas .select-char-menu .i-icon {
+  width: 96vw;
+  justify-content: end;
+  margin-top: 1.5vh;
+  display: flex;
+  position: absolute;
+  top: 0;
+}
+
+body #gameCanvas .select-char-menu .i-icon img {
+  width: 8.5%;
+}
+
 body #gameCanvas .select-char-menu .player-head {
   text-align: center;
-  width: 100%;
+  width: 100vw;
+  height: 0;
   color: #fff;
-  padding-top: 2vh;
+  margin: 0;
+  padding: 0;
   font-family: Prompt-Bold;
   position: absolute;
+  top: 7vh;
+}
+
+body #gameCanvas .select-char-menu .player-head h1 {
+  height: 0;
+  margin: 0;
 }
 
 body #gameCanvas .select-char-menu .btn-row-txt {
   text-align: center;
-  width: 100%;
+  width: 100vw;
   color: #fff;
   text-shadow: 2px 4px #5a0713;
   font-family: Prompt-Bold;
-  font-size: 1.5rem;
+  font-size: 6vw;
   position: absolute;
-  top: 58vh;
+  top: 57vh;
 }
 
 body #gameCanvas .select-char-menu .button-char {
@@ -185,7 +261,7 @@ body #gameCanvas .select-char-menu .button-char {
   gap: 1vh;
   display: flex;
   position: absolute;
-  top: 68%;
+  top: 66.5vh;
 }
 
 body #gameCanvas .select-char-menu .button-char .btn-row {
@@ -198,7 +274,7 @@ body #gameCanvas .select-char-menu .button-char .btn-row {
 body #gameCanvas .select-char-menu .button-char .btn-row button {
   clip-path: polygon(15% 0, 100% 0%, 85% 100%, 0% 100%);
   border-radius: 0 .8rem;
-  padding: 1vh 1rem;
+  padding: 1vh 5vw;
   font-family: Prompt-Bold;
 }
 
@@ -247,14 +323,14 @@ body #gameCanvas .select-char-menu .main-game-btn {
   justify-content: center;
   display: flex;
   position: absolute;
-  top: 87%;
+  top: 87vh;
 }
 
 body #gameCanvas .select-char-menu .main-game-btn button {
   color: #fff;
   background-color: red;
-  border-radius: 25px;
-  padding: 1vh 2rem;
+  border-radius: 5vw;
+  padding: 1vh 8vw;
   font-family: Prompt-Bold;
   font-size: 1.2rem;
 }
@@ -321,19 +397,24 @@ body #gameCanvas .game-interface .swipe-top-play img {
 }
 
 body #gameCanvas .game-interface .ui-container {
-  width: 100%;
+  width: 50%;
+  z-index: 2;
   flex-wrap: wrap;
   justify-content: center;
   display: flex;
   position: fixed;
-  top: 90vh;
+  top: 94vh;
+  left: 1vw;
 }
 
 body #gameCanvas .game-interface .ui-container .football-left {
-  width: 80%;
+  width: 90%;
   grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  column-gap: .5rem;
   display: grid;
+}
+
+body #gameCanvas .game-interface .ui-container .football-left .football-display {
+  margin-left: 1vw;
 }
 
 body #gameCanvas .game-interface .ui-container .football-left .football-display img {
@@ -341,22 +422,40 @@ body #gameCanvas .game-interface .ui-container .football-left .football-display 
   margin: 0 auto;
 }
 
-body #gameCanvas .game-interface .ui-container .football-empty {
-  z-index: -99;
-  width: 80%;
-  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-  column-gap: .5rem;
-  display: grid;
+body #gameCanvas .game-interface .ui-empty {
+  width: 50%;
+  z-index: 1;
+  flex-wrap: wrap;
+  justify-content: center;
+  display: flex;
   position: fixed;
+  top: 94vh;
+  left: 1vw;
 }
 
-body #gameCanvas .game-interface .ui-container .football-empty .football-empty-display .dot {
-  height: 6.3vh;
-  width: 3.3rem;
-  background-color: #dbdbdb;
-  border-radius: 50%;
-  display: inline-block;
-  box-shadow: 0 4px 8px #0003, 0 6px 20px #00000030;
+body #gameCanvas .game-interface .ui-empty .football-empty {
+  width: 90%;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  display: grid;
+}
+
+body #gameCanvas .game-interface .ui-empty .football-empty .circle-display {
+  margin-left: 1vw;
+}
+
+body #gameCanvas .game-interface .ui-empty .football-empty .circle-display img {
+  width: 98%;
+  margin: 0 auto;
+}
+
+body #gameCanvas .game-interface .score-display-lower {
+  text-shadow: 2px 4px #5a0713;
+  color: #fff;
+  font-family: Prompt-Bold;
+  font-size: 8vw;
+  position: fixed;
+  top: 93.5vh;
+  left: 68vw;
 }
 
 body #gameCanvas .final-score-ui {
