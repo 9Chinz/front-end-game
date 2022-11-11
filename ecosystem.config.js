@@ -9,7 +9,6 @@ module.exports = {
   },{
     name   : "frontend-app-prod",
     script : "./index.js",
-    watch: true,
     env: {
       NODE_ENV: "production"
     }
