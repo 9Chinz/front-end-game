@@ -23,7 +23,7 @@ const jwtAuth = new jwtStrategy(jwtOption, (payload, done) => {
     const timestamp = new Date().toLocaleString('th-Th', { timeZone: 'Asia/Bangkok' })    
     // check statue ment to open game
     if (payload.game_id !== GAME_ID){
-        console.error(new Error(`${timestamp} not allow game page: game id is ${payload.game_id}`))
+        console.error(`${timestamp} not allow game page: game id is ${payload.game_id}`)
         return done(null, false);
     }else{
         console.log(`${timestamp} allow game page: game id is ${payload.game_id}`)
@@ -58,6 +58,7 @@ const postOption = {
 }
 
 app.post('/sendUpdate', async (req, res) => {
+    const timestamp = new Date().toLocaleString('th-Th', { timeZone: 'Asia/Bangkok' }) 
     const { accessToken, point, newReference } = req.body;
     const {reference, game_id, configuration, iat, exp} = jwt.decode(accessToken);
     
@@ -74,12 +75,12 @@ app.post('/sendUpdate', async (req, res) => {
     }
 
     try {
-        const timestamp = new Date().toLocaleString('th-Th', { timeZone: 'Asia/Bangkok' }) 
+        
         let result = await axios.post(`${config.API_ENDPOINT_MCARD}/api/gamification/v1/update-result`, jsonData, postOption);
         console.log(`${timestamp} update success {${config.NODE_ENV}}: at ${config.API_ENDPOINT_MCARD} | ${JSON.stringify(jsonData)} | ${JSON.stringify(postOption)}`)
         res.status(200).json(result.data);
     } catch (err) {
-        console.error(new Error(`${timestamp} error ${JSON.stringify(err.response.data)}`))
+        console.error(`${timestamp} error ${JSON.stringify(err.response.data)}`)
         res.send(err.response.data);
     }
     
