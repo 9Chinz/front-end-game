@@ -1141,6 +1141,7 @@ async function renderGame() {
         loadingGame.setAttribute("style", "display:flex;");
         try {
             const jsonResData = await sendUpdate();
+            if (jsonResData.code != 200) throw new Error(`code ${jsonResData.code}: ${jsonResData.errors}`);
             if (jsonResData.configuration["credit"] <= 0) {
                 document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
                 tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
@@ -1150,7 +1151,7 @@ async function renderGame() {
             }
         } catch (error) {
             document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-            console.error(error);
+            console.error(`${error}`);
         }
         loadingGame.setAttribute("style", "display:none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
@@ -1271,18 +1272,22 @@ playAgain.addEventListener("click", ()=>{
     document.querySelector(".final-score-ui").setAttribute("style", "display: none;");
 });
 const sendUpdate = async ()=>{
-    const res = await fetch(`https://${window.location.host}/sendUpdate`, {
-        method: "POST",
-        body: JSON.stringify({
-            accessToken: accessToken,
-            point: shootSuccess,
-            newReference: newRef
-        }),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    });
-    return res.json();
+    try {
+        const res = await fetch(`https://${window.location.host}/sendUpdate`, {
+            method: "POST",
+            body: JSON.stringify({
+                accessToken: accessToken,
+                point: shootSuccess,
+                newReference: newRef
+            }),
+            headers: {
+                "Content-Type": "application/json"
+            }
+        });
+        return res.json();
+    } catch (error) {
+        return error;
+    }
 };
 window.onload = ()=>{
     window.scrollTo(0, 1);
