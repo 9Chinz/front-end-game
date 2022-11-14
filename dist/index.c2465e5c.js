@@ -1139,13 +1139,18 @@ async function renderGame() {
         isShoot = false;
         lockShoot = true;
         loadingGame.setAttribute("style", "display:flex;");
-        const jsonResData = await sendUpdate();
-        if (jsonResData.configuration["credit"] <= 0) {
+        try {
+            const jsonResData = await sendUpdate();
+            if (jsonResData.configuration["credit"] <= 0) {
+                document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
+                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+            } else {
+                newRef = jsonResData.reference;
+                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+            }
+        } catch (error) {
             document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-            tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
-        } else {
-            newRef = jsonResData.reference;
-            tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+            console.error(error);
         }
         loadingGame.setAttribute("style", "display:none;");
         scoreDisplayBoard.innerHTML = shootSuccess;

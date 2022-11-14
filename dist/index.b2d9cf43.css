@@ -47,7 +47,7 @@ body #gameCanvas .start-menu .token-left p {
   color: #fff;
   margin: .3vh 0 0 2.5vw;
   font-family: Prompt-Bold;
-  font-size: 1.5rem;
+  font-size: 6vw;
 }
 
 body #gameCanvas .start-menu .visa-logo {
@@ -135,7 +135,7 @@ body #gameCanvas .start-menu .banner-lower img {
 
 body #gameCanvas .start-menu .football {
   max-width: 60%;
-  margin-top: 4.5vh;
+  margin-top: 3.5vh;
   margin-left: auto;
   margin-right: auto;
 }
@@ -431,7 +431,7 @@ body #gameCanvas .select-char-menu .main-game-btn button {
   border-radius: 7vw;
   padding: 1vh 8vw;
   font-family: Prompt-Bold;
-  font-size: 1.2rem;
+  font-size: 5.5vw;
   box-shadow: 1vw .6vh #a5131e;
 }
 
@@ -467,7 +467,7 @@ body #gameCanvas .game-interface .goal-show p {
   color: #fff;
   margin: 8vh 0 0;
   font-family: Prompt-Bold;
-  font-size: 3rem;
+  font-size: 12vw;
   font-style: italic;
   position: absolute;
 }
@@ -571,7 +571,7 @@ body #gameCanvas .final-score-ui {
 
 body #gameCanvas .final-score-ui .token-left {
   width: 8%;
-  margin: 0 0 0 1rem;
+  margin: 0 0 0 5vw;
   padding-top: 3vh;
   display: flex;
 }
@@ -585,10 +585,10 @@ body #gameCanvas .final-score-ui .token-left p {
   color: #fff;
   margin: 0;
   font-family: Prompt-Bold;
-  font-size: 1.5rem;
+  font-size: 7vw;
   position: absolute;
   top: 2.8vh;
-  left: 3.5rem;
+  left: 15vw;
 }
 
 body #gameCanvas .final-score-ui .score-word {
@@ -619,7 +619,7 @@ body #gameCanvas .final-score-ui .final-score p {
   color: #fff;
   margin: 0;
   font-family: Prompt-Bold;
-  font-size: 5rem;
+  font-size: 20vw;
   font-style: italic;
   position: absolute;
   top: 28vh;
