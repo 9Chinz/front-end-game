@@ -1139,27 +1139,20 @@ async function renderGame() {
         isShoot = false;
         lockShoot = true;
         loadingGame.setAttribute("style", "display:flex;");
-        await new Promise((res, rej)=>{
-            setTimeout(()=>{
-                res();
-            }, 1000);
-        });
-        // try {
-        //     const jsonResData = await sendUpdate()
-        //     if (jsonResData.code != 200) {
-        //         throw new Error(`code ${jsonResData.code}: ${jsonResData.errors}`)
-        //     }
-        //     if (jsonResData.configuration['credit'] <= 0) {
-        //         document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
-        //         tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
-        //     } else {
-        //         newRef = jsonResData.reference
-        //         tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
-        //     }
-        // } catch (error) {
-        //     document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
-        //     console.error(`${error}`)
-        // }
+        try {
+            const jsonResData = await sendUpdate();
+            if (jsonResData.code != 200) throw new Error(`code ${jsonResData.code}: ${jsonResData.errors}`);
+            if (jsonResData.configuration["credit"] <= 0) {
+                document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
+                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+            } else {
+                newRef = jsonResData.reference;
+                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
+            }
+        } catch (error) {
+            document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
+            console.error(`${error}`);
+        }
         loadingGame.setAttribute("style", "display:none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
         gameRound = 0;
@@ -1202,6 +1195,13 @@ const splide = new (0, _splideDefault.default)(".splide", {
     padding: "8vw",
     start: 0
 });
+async function delayPressBtn(delayTime = 60) {
+    return new Promise((res, rej)=>{
+        setTimeout(()=>{
+            res();
+        }, delayTime);
+    });
+}
 // control menu
 function goToSelectPage() {
     loadingMenu.setAttribute("style", "display:flex;");
@@ -1210,7 +1210,8 @@ function goToSelectPage() {
     canvasTag.style.backgroundImage = `url(${bgSelectChar.href})`;
 }
 let isPressPlay = false;
-goSelectChar.addEventListener("click", ()=>{
+goSelectChar.addEventListener("click", async ()=>{
+    await delayPressBtn();
     const isFirstPlay = (0, _jsCookieDefault.default).get("isPlay") == undefined ? true : false;
     if (isFirstPlay) {
         (0, _jsCookieDefault.default).set("isPlay", "true", {
@@ -1232,17 +1233,20 @@ function showTutorial() {
 let beforePage = "startMenu";
 const howToPlayBtn = document.getElementById("show_how_to_play");
 const iTutotialBtn = document.getElementById("i-tutorial");
-howToPlayBtn.addEventListener("click", ()=>{
+howToPlayBtn.addEventListener("click", async ()=>{
+    await delayPressBtn();
     startMenu.setAttribute("style", "display:none");
     showTutorial();
 });
-iTutotialBtn.addEventListener("click", ()=>{
+iTutotialBtn.addEventListener("click", async ()=>{
+    await delayPressBtn();
     selectCharMenu.setAttribute("style", "display:none");
     pageName["selectCharPage"].setAttribute("style", "display:none");
     showTutorial();
     beforePage = "selectMenu";
 });
 skipBtn.addEventListener("click", async ()=>{
+    await delayPressBtn();
     splide.destroy();
     if (beforePage == "startMenu") {
         if (isPressPlay) goToSelectPage();
@@ -1254,7 +1258,8 @@ skipBtn.addEventListener("click", async ()=>{
     }
     tutorialPage.setAttribute("style", "display:none;");
 });
-goMainGame.addEventListener("click", ()=>{
+goMainGame.addEventListener("click", async ()=>{
+    await delayPressBtn();
     loadingGame.setAttribute("style", "display:flex;");
     currentShow = undefined;
     canvasTag.style.backgroundImage = `url(${bgGame.href})`;
@@ -1263,7 +1268,8 @@ goMainGame.addEventListener("click", ()=>{
     document.querySelector(".game-interface").setAttribute("style", "display: block");
     startGame();
 });
-playAgain.addEventListener("click", ()=>{
+playAgain.addEventListener("click", async ()=>{
+    await delayPressBtn();
     for(let i = 0; i < 5; i++){
         const fbDisplayDiv = document.createElement("div");
         const imgFbDisplay = document.createElement("img");
@@ -1297,7 +1303,7 @@ const sendUpdate = async ()=>{
     }
 };
 window.onload = ()=>{
-    window.scrollTo(0, 1);
+    window.scrollTo(0, 10);
     startMenu.addEventListener("touchend", ()=>{
         if (!bgMusicPlayed) {
             bgMusic.play();
@@ -1314,7 +1320,8 @@ function parseJwt(token) {
     }).join(""));
     return JSON.parse(jsonPayload);
 }
-goToRewardBtn.addEventListener("click", ()=>{
+goToRewardBtn.addEventListener("click", async ()=>{
+    await delayPressBtn();
     window.open("mcard://mgame/rewards", "_self");
 });
 
