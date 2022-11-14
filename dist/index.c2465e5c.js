@@ -578,6 +578,7 @@ const tutorialPage = document.querySelector(".tutorial-page");
 const skipBtn = document.getElementById("skip-tutorial-btn");
 const goSelectChar = document.getElementById("go_select_char");
 const loadingMenu = document.querySelector(".loading-menu");
+const loadingGame = document.querySelector(".loading-game");
 const selectCharMenu = document.querySelector(".select-char-menu");
 const startMenu = document.querySelector(".start-menu");
 const goMainGame = document.getElementById("go_main_game");
@@ -590,6 +591,7 @@ const scorePerRound = document.getElementById("score_diplay_round");
 const goalBoard = document.querySelector(".goal-show");
 const scoreUiLower = document.getElementById("score_ui_lower");
 const bgGame = new URL(require("d8e3f35c383595e3"));
+const bgSelectChar = new URL(require("652db8831f96a8f7"));
 let bgMusic = new (0, _howler.Howl)({
     src: [
         new URL(require("aa95346fdddea861")).href
@@ -650,6 +652,7 @@ let winSound = new (0, _howler.Howl)({
     webAudio: false,
     volume: 0.5
 });
+const canvasTag = document.getElementById("gameCanvas");
 let el;
 let scene, renderer, camera;
 let stats, controls, axesHelp, cannonDebug;
@@ -674,6 +677,8 @@ let shootTime;
 let gameRound = 0;
 let shootSuccess = 0;
 let totalBall = 5;
+let shootGoal = false;
+let shootDirection = "";
 let footballLeftSection = document.querySelector(".football-left");
 let lockShoot = false;
 let newRef = "";
@@ -685,6 +690,10 @@ loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
     selectCharMenu.setAttribute("style", "display:block");
     isLoaded = true;
+};
+const loadingGameManage = new _three.LoadingManager();
+loadingGameManage.onLoad = ()=>{
+    loadingGame.setAttribute("style", "display:none;");
 };
 function start() {
     renderer = new _three.WebGLRenderer({
@@ -726,8 +735,8 @@ function start() {
 }
 function windowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.updateProjectionMatrix();
 }
 function initObject() {
     loadModel(argenUrl, "argen", true);
@@ -853,6 +862,7 @@ function initPhysics() {
     groundBody.position.set(0, 40, -50);
     groundBody.addEventListener("collide", ()=>{
         failSound.play();
+        shootGoal = false;
     });
     physicsWorld.addBody(groundBody);
     const groundBody2 = new _cannonEs.Body({
@@ -869,6 +879,7 @@ function initPhysics() {
     physicsWorld.addBody(goalBody);
     goalBody.addEventListener("collide", ()=>{
         winSound.play();
+        shootGoal = true;
         shootSuccess += 1;
         scoreUiLower.innerHTML = shootSuccess;
         scorePerRound.innerHTML = shootSuccess;
@@ -878,6 +889,7 @@ function initPhysics() {
         shape: new _cannonEs.Box(new _cannonEs.Vec3(3, 3, 2))
     });
     goalCurrenBlock.addEventListener("collide", ()=>{
+        shootGoal = false;
         failSound.play();
     });
     goalCurrenBlock.position.set(0, 14, -38);
@@ -892,7 +904,7 @@ function initPhysics() {
     physicsWorld.addBody(sphrBody);
 }
 function initGameObj() {
-    const txLoader = new _three.TextureLoader();
+    const txLoader = new _three.TextureLoader(loadingGameManage);
     const footballUrl = new URL(require("647bda67cd6532cf"));
     txLoader.load(footballUrl.href, (txt)=>{
         const sphrGeo = new _three.SphereGeometry(1);
@@ -903,7 +915,7 @@ function initGameObj() {
         scene.add(sphrThree);
     });
     const GoalUrl = new URL(require("3188fd7267f3312c"));
-    assetLoader = new (0, _gltfloaderJs.GLTFLoader)();
+    assetLoader = new (0, _gltfloaderJs.GLTFLoader)(loadingGameManage);
     assetLoader.load(GoalUrl.href, (gltf)=>{
         goalKeeperThree = gltf.scene;
         const goalScale = 7;
@@ -948,118 +960,117 @@ function initGameControl() {
     //var el = pageName['mainGamePage']
     const BALLSPEED = -45;
     (0, _swipeControlsJsDefault.default)(el, function(swipedir) {
-        if (!isShoot && !lockShoot) switch(swipedir){
-            case "fastTop":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(0, 28, BALLSPEED * 2.5);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "fastTopFar":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(0, 55, BALLSPEED * 3);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "fastLeftFar":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(-45, 55, BALLSPEED * 3);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "fastLeft":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(-33, 25, BALLSPEED * 2.5);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "slowLeft":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(-22, 10, BALLSPEED * 1.4);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "fastRightFar":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(45, 55, BALLSPEED * 3);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "fastRight":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(33, 25, BALLSPEED * 2.5);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            case "slowRight":
-                el.setAttribute("style", "display:none;");
-                isShoot = true;
-                shootTime = new Date().getTime();
-                setTimeout(()=>{
-                    hitFootballSound.play();
-                    randomBlockPosition();
-                    sphrBody.velocity.set(22, 10, BALLSPEED * 1.4);
-                    playerThree.visible = false;
-                }, 800);
-                playHardKick();
-                break;
-            default:
-                break;
+        if (!isShoot && !lockShoot) {
+            shootDirection = swipedir;
+            switch(swipedir){
+                case "fastTop":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(0, 28, BALLSPEED * 2.5);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "fastTopFar":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(0, 55, BALLSPEED * 3);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "fastLeftFar":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(-45, 55, BALLSPEED * 3);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "fastLeft":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(-33, 25, BALLSPEED * 2.5);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "slowLeft":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(-22, 10, BALLSPEED * 1.4);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "fastRightFar":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(45, 55, BALLSPEED * 3);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "fastRight":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(33, 25, BALLSPEED * 2.5);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                case "slowRight":
+                    el.setAttribute("style", "display:none;");
+                    isShoot = true;
+                    shootTime = new Date().getTime();
+                    setTimeout(()=>{
+                        hitFootballSound.play();
+                        randomBlockPosition();
+                        sphrBody.velocity.set(22, 10, BALLSPEED * 1.4);
+                        playerThree.visible = false;
+                    }, 800);
+                    playHardKick();
+                    break;
+                default:
+                    break;
+            }
         }
     });
 }
 function playHardKick() {
+    footballLeftSection.removeChild(footballLeftSection.children[totalBall - 1]);
     playerThree.visible = true;
     playerAnimations["HardKick"].play();
     playerAnimations["HardKick"].reset();
 }
-// function playSoftKick() {
-//     playerThree.visible = true
-//     playerAnimations['SoftKick'].play()
-//     playerAnimations['SoftKick'].reset()
-// }
 function randomBlockPosition() {
     const blockPosition = [
         "TopMiddle",
@@ -1069,7 +1080,6 @@ function randomBlockPosition() {
         "Left"
     ];
     const getBlockPosition = blockPosition[Math.floor(Math.random() * blockPosition.length)];
-    //console.log(`now block ${getBlockPosition}`)
     switch(getBlockPosition){
         case "TopMiddle":
             goalAnimations["TopMiddle"].play();
@@ -1106,15 +1116,30 @@ function initDebugTool() {
     scene.add(axesHelp);
     cannonDebug = new (0, _cannonEsDebuggerDefault.default)(scene, physicsWorld);
 }
+function resetRound() {
+    el.setAttribute("style", "display:flex");
+    goalBoard.setAttribute("style", "display:none");
+    isShoot = false;
+    shootGoal = false;
+    totalBall -= 1;
+    gameRound += 1;
+    physicsWorld.removeBody(goalCurrenBlock);
+    sphrBody.position.set(0, 2, 15);
+    sphrBody.quaternion.setFromEuler(0, Math.PI - 0.4, 0);
+    sphrBody.interpolatedPosition.setZero();
+    sphrBody.initPosition.setZero();
+    sphrBody.velocity.setZero();
+    sphrBody.initVelocity.setZero();
+    sphrBody.angularVelocity.setZero();
+    sphrBody.initAngularVelocity.setZero();
+}
 async function renderGame() {
-    //console.log(`shoot status ${isShoot}| lock status ${lockShoot} | round ${gameRound} | shootTime ${shootTime}`)
-    // console.log(`round ${gameRound}`)
     // event key
     if (gameRound >= 5) {
         isShoot = false;
         lockShoot = true;
+        loadingGame.setAttribute("style", "display:flex;");
         const jsonResData = await sendUpdate();
-        console.log(jsonResData);
         if (jsonResData.configuration["credit"] <= 0) {
             document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
             tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
@@ -1122,29 +1147,20 @@ async function renderGame() {
             newRef = jsonResData.reference;
             tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
         }
+        loadingGame.setAttribute("style", "display:none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
         gameRound = 0;
         shootSuccess = 0;
         document.querySelector(".final-score-ui").setAttribute("style", "display: block;");
     }
     if (isShoot) {
-        if (new Date().getTime() - shootTime >= 3000) {
-            el.setAttribute("style", "display:flex");
-            goalBoard.setAttribute("style", "display:none");
-            isShoot = false;
-            footballLeftSection.removeChild(footballLeftSection.children[totalBall - 1]);
-            totalBall -= 1;
-            gameRound += 1;
-            physicsWorld.removeBody(goalCurrenBlock);
-            sphrBody.position.set(0, 2, 15);
-            sphrBody.quaternion.setFromEuler(0, Math.PI - 0.4, 0);
-            sphrBody.interpolatedPosition.setZero();
-            sphrBody.initPosition.setZero();
-            sphrBody.velocity.setZero();
-            sphrBody.initVelocity.setZero();
-            sphrBody.angularVelocity.setZero();
-            sphrBody.initAngularVelocity.setZero();
-        }
+        // shoot delay condition
+        const nowTime = new Date().getTime();
+        if (nowTime - shootTime >= 3000 && !shootGoal) resetRound();
+        else if (nowTime - shootTime >= 3100 && shootGoal && shootDirection == "fastTop") resetRound();
+        else if (nowTime - shootTime >= 3200 && shootGoal && (shootDirection == "fastRight" || shootDirection == "fastLeft")) resetRound();
+        else if (nowTime - shootTime >= 3500 && shootGoal && (shootDirection == "slowRight" || shootDirection == "slowLeft")) resetRound();
+        else if (nowTime - shootTime >= 3500) resetRound();
     }
     // for update position
     // if have three with cannon
@@ -1178,14 +1194,16 @@ function goToSelectPage() {
     loadingMenu.setAttribute("style", "display:flex;");
     startMenu.setAttribute("style", "display:none;");
     start();
+    canvasTag.style.backgroundImage = `url(${bgSelectChar.href})`;
 }
 let isPressPlay = false;
 goSelectChar.addEventListener("click", ()=>{
     const isFirstPlay = (0, _jsCookieDefault.default).get("isPlay") == undefined ? true : false;
     if (isFirstPlay) {
-        (0, _jsCookieDefault.default).set("isPlay", "true");
+        (0, _jsCookieDefault.default).set("isPlay", "true", {
+            expires: 730
+        });
         isPressPlay = true;
-        console.log("first time hrr");
         startMenu.setAttribute("style", "display:none");
         showTutorial();
     } else goToSelectPage();
@@ -1217,24 +1235,20 @@ skipBtn.addEventListener("click", async ()=>{
         if (isPressPlay) goToSelectPage();
         else startMenu.setAttribute("style", "display:block");
     } else if (beforePage == "selectMenu") {
-        selectCharMenu.setAttribute("style", "display:block");
+        selectCharMenu.setAttribute("style", "display:block;");
         await renderer.dispose();
-        await document.getElementById("gameCanvas").removeChild(pageName["selectCharPage"]);
-        isLoaded = false;
-        start();
+        pageName["selectCharPage"].setAttribute("style", `display:block; height: ${window.innerHeight}px; width: ${window.innerWidth}px; touch-action: none;`);
     }
     tutorialPage.setAttribute("style", "display:none;");
 });
 goMainGame.addEventListener("click", ()=>{
-    if (isLoaded) {
-        currentShow = undefined;
-        const canvas = document.getElementById("gameCanvas");
-        canvas.style.backgroundImage = `url(${bgGame.href})`;
-        pageName["selectCharPage"].setAttribute("style", "display:none");
-        selectCharMenu.setAttribute("style", "display:none");
-        document.querySelector(".game-interface").setAttribute("style", "display: block");
-        startGame();
-    }
+    loadingGame.setAttribute("style", "display:flex;");
+    currentShow = undefined;
+    canvasTag.style.backgroundImage = `url(${bgGame.href})`;
+    pageName["selectCharPage"].setAttribute("style", "display:none");
+    selectCharMenu.setAttribute("style", "display:none");
+    document.querySelector(".game-interface").setAttribute("style", "display: block");
+    startGame();
 });
 playAgain.addEventListener("click", ()=>{
     for(let i = 0; i < 5; i++){
@@ -1266,6 +1280,7 @@ const sendUpdate = async ()=>{
     return res.json();
 };
 window.onload = ()=>{
+    window.scrollTo(0, 1);
     startMenu.addEventListener("touchend", ()=>{
         if (!bgMusicPlayed) {
             bgMusic.play();
@@ -1286,7 +1301,7 @@ goToRewardBtn.addEventListener("click", ()=>{
     window.open("mcard://mgame/rewards", "_self");
 });
 
-},{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","howler":"5Vjgk","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","d8e3f35c383595e3":"9j26s","aa95346fdddea861":"7FkYd","5c555afdcf310d9c":"6QfkP","19ea53875e5d53e7":"iS9ja","104e0ac6a8693ccb":"h1L3E","4df743630a86dc33":"7RB4V","647bda67cd6532cf":"2Z8nk","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","js-cookie":"c8bBu","5c4ca6b4639d1d51":"fXgSV","@splidejs/splide":"5CJev"}],"ktPTu":[function(require,module,exports) {
+},{"three":"ktPTu","three/examples/jsm/loaders/GLTFLoader.js":"dVRsF","three/examples/jsm/controls/OrbitControls.js":"7mqRv","three/examples/jsm/libs/stats.module":"6xUSB","cannon-es":"HCu3b","cannon-es-debugger":"a5KNJ","./js/swipeControls.js":"fIPiV","howler":"5Vjgk","58848d0079a09d57":"4MpVO","7c1ef81311401fad":"1BjmQ","55b72701edf72064":"hFn47","ccd19c951c0d4e42":"knz7N","48d455e429887941":"hNyPb","6c31ed40044bc293":"b3ZSz","5b58ffaaa81606fd":"9o9hp","394cdb9504b215c7":"9sCeD","d8e3f35c383595e3":"9j26s","aa95346fdddea861":"7FkYd","5c555afdcf310d9c":"6QfkP","19ea53875e5d53e7":"iS9ja","104e0ac6a8693ccb":"h1L3E","4df743630a86dc33":"7RB4V","647bda67cd6532cf":"2Z8nk","3188fd7267f3312c":"2n4ZN","@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3","js-cookie":"c8bBu","5c4ca6b4639d1d51":"fXgSV","@splidejs/splide":"5CJev","652db8831f96a8f7":"2fd7w"}],"ktPTu":[function(require,module,exports) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "ACESFilmicToneMapping", ()=>ACESFilmicToneMapping);
@@ -48677,6 +48692,9 @@ var SplideRenderer = /*#__PURE__*/ function() {
     return SplideRenderer;
 }();
 
-},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3"}]},["ilxF6","4g5fn"], "4g5fn", "parcelRequiree7db")
+},{"@parcel/transformer-js/src/esmodule-helpers.js":"5Pvo3"}],"2fd7w":[function(require,module,exports) {
+module.exports = require("./helpers/bundle-url").getBundleURL("etl7T") + "Select-Char.af26d599.png" + "?" + Date.now();
+
+},{"./helpers/bundle-url":"25lHr"}]},["ilxF6","4g5fn"], "4g5fn", "parcelRequiree7db")
 
 //# sourceMappingURL=index.c2465e5c.js.map
