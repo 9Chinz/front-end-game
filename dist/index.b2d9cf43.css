@@ -224,6 +224,7 @@ body #gameCanvas .select-char-menu .i-icon {
 
 body #gameCanvas .select-char-menu .i-icon img {
   width: 8.5%;
+  padding: 1vh 2vw;
 }
 
 body #gameCanvas .select-char-menu .player-head {
@@ -455,7 +456,7 @@ body #gameCanvas .game-interface .score-display-lower {
   font-size: 8vw;
   position: fixed;
   top: 93.5vh;
-  left: 68vw;
+  left: 65vw;
 }
 
 body #gameCanvas .final-score-ui {

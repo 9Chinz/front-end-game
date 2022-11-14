@@ -679,10 +679,12 @@ let lockShoot = false;
 let newRef = "";
 let tokenLeft = document.getElementById("token_display");
 let tokenBegin = document.getElementById("token_begin");
+let isLoaded = false;
 const loadingManage = new _three.LoadingManager();
 loadingManage.onLoad = ()=>{
     loadingMenu.setAttribute("style", "display:none;");
     selectCharMenu.setAttribute("style", "display:block");
+    isLoaded = true;
 };
 function start() {
     renderer = new _three.WebGLRenderer({
@@ -946,7 +948,6 @@ function initGameControl() {
     //var el = pageName['mainGamePage']
     const BALLSPEED = -45;
     (0, _swipeControlsJsDefault.default)(el, function(swipedir) {
-        console.log(swipedir);
         if (!isShoot && !lockShoot) switch(swipedir){
             case "fastTop":
                 el.setAttribute("style", "display:none;");
@@ -1128,7 +1129,6 @@ async function renderGame() {
     }
     if (isShoot) {
         if (new Date().getTime() - shootTime >= 3000) {
-            console.log("out of time");
             el.setAttribute("style", "display:flex");
             goalBoard.setAttribute("style", "display:none");
             isShoot = false;
@@ -1206,7 +1206,6 @@ howToPlayBtn.addEventListener("click", ()=>{
     showTutorial();
 });
 iTutotialBtn.addEventListener("click", ()=>{
-    console.log("clikc");
     selectCharMenu.setAttribute("style", "display:none");
     pageName["selectCharPage"].setAttribute("style", "display:none");
     showTutorial();
@@ -1218,21 +1217,24 @@ skipBtn.addEventListener("click", async ()=>{
         if (isPressPlay) goToSelectPage();
         else startMenu.setAttribute("style", "display:block");
     } else if (beforePage == "selectMenu") {
+        selectCharMenu.setAttribute("style", "display:block");
         await renderer.dispose();
         await document.getElementById("gameCanvas").removeChild(pageName["selectCharPage"]);
+        isLoaded = false;
         start();
-        selectCharMenu.setAttribute("style", "display:block");
     }
     tutorialPage.setAttribute("style", "display:none;");
 });
 goMainGame.addEventListener("click", ()=>{
-    currentShow = undefined;
-    const canvas = document.getElementById("gameCanvas");
-    canvas.style.backgroundImage = `url(${bgGame.href})`;
-    pageName["selectCharPage"].setAttribute("style", "display:none");
-    selectCharMenu.setAttribute("style", "display:none");
-    document.querySelector(".game-interface").setAttribute("style", "display: block");
-    startGame();
+    if (isLoaded) {
+        currentShow = undefined;
+        const canvas = document.getElementById("gameCanvas");
+        canvas.style.backgroundImage = `url(${bgGame.href})`;
+        pageName["selectCharPage"].setAttribute("style", "display:none");
+        selectCharMenu.setAttribute("style", "display:none");
+        document.querySelector(".game-interface").setAttribute("style", "display: block");
+        startGame();
+    }
 });
 playAgain.addEventListener("click", ()=>{
     for(let i = 0; i < 5; i++){
