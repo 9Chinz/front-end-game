@@ -15,7 +15,7 @@ body {
 }
 
 body #gameCanvas {
-  background-image: url("Main-Menu.fbb3f808.png");
+  background-image: url("Main-Menu.bd5e86b0.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -25,7 +25,7 @@ body #gameCanvas {
 body #gameCanvas .start-menu {
   height: 100vh;
   width: 100vw;
-  background-image: url("Main-Menu.fbb3f808.png");
+  background-image: url("Main-Menu.bd5e86b0.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -181,7 +181,7 @@ body #gameCanvas .animate-slidein {
 body #gameCanvas .loading-menu {
   width: 100%;
   height: 100vh;
-  background-image: url("Main-Menu.fbb3f808.png");
+  background-image: url("Main-Menu.bd5e86b0.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
@@ -245,7 +245,7 @@ body #gameCanvas .loading-game p {
 body #gameCanvas .tutorial-page {
   width: 100vw;
   height: 100vh;
-  background-image: url("Main-Menu.fbb3f808.png");
+  background-image: url("Main-Menu.bd5e86b0.jpg");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100% 100%;
