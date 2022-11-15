@@ -1117,7 +1117,8 @@ function initDebugTool() {
     cannonDebug = new (0, _cannonEsDebuggerDefault.default)(scene, physicsWorld);
 }
 function resetRound() {
-    el.setAttribute("style", "display:flex");
+    if (gameRound >= 5) el.setAttribute("style", "display:none;");
+    else el.setAttribute("style", "display:flex");
     goalBoard.setAttribute("style", "display:none");
     isShoot = false;
     shootGoal = false;
@@ -1139,20 +1140,23 @@ async function renderGame() {
         isShoot = false;
         lockShoot = true;
         loadingGame.setAttribute("style", "display:flex;");
-        try {
-            const jsonResData = await sendUpdate();
-            if (jsonResData.code != 200) throw new Error(`code ${jsonResData.code}: ${jsonResData.errors}`);
-            if (jsonResData.configuration["credit"] <= 0) {
-                document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
-            } else {
-                newRef = jsonResData.reference;
-                tokenLeft.innerHTML = `x${jsonResData.configuration["credit"]}`;
-            }
-        } catch (error) {
-            document.querySelector(".play-again-btn").setAttribute("style", "display: none;");
-            console.error(`${error}`);
-        }
+        el.setAttribute("style", "display:none;");
+        // try {
+        //     const jsonResData = await sendUpdate()
+        //     if (jsonResData.code != 200) {
+        //         throw new Error(`code ${jsonResData.code}: ${jsonResData.errors}`)
+        //     }
+        //     if (jsonResData.configuration['credit'] <= 0) {
+        //         document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
+        //         tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
+        //     } else {
+        //         newRef = jsonResData.reference
+        //         tokenLeft.innerHTML = `x${jsonResData.configuration['credit']}`
+        //     }
+        // } catch (error) {
+        //     document.querySelector('.play-again-btn').setAttribute('style', 'display: none;')
+        //     console.error(`${error}`)
+        // }
         loadingGame.setAttribute("style", "display:none;");
         scoreDisplayBoard.innerHTML = shootSuccess;
         gameRound = 0;
@@ -1282,6 +1286,7 @@ playAgain.addEventListener("click", async ()=>{
     totalBall = 5;
     isShoot = false;
     lockShoot = false;
+    el.setAttribute("style", "display:flex");
     document.querySelector(".final-score-ui").setAttribute("style", "display: none;");
 });
 const sendUpdate = async ()=>{
